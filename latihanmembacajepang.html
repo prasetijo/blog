@@ -74,6 +74,9 @@ h1{font-size:24px;font-weight:700;margin:0;line-height:1.2}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chips button{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-size:14px;font-weight:700}
 .revbtn{width:100%;margin-top:18px;background:var(--accent);color:var(--accent-ink);border:0;border-radius:14px;padding:13px;font-weight:700;font-size:15px}
+.hf{margin-top:18px;font-size:14px}.hf label{display:flex;gap:8px;align-items:flex-start;font-weight:600}
+.hs{color:var(--muted);margin:6px 0}.wk{margin:6px 0;color:var(--muted)}
+.wk span{display:inline-block;margin:2px 4px 2px 0;padding:3px 9px;border:1px solid var(--line);border-radius:8px;font-size:18px;color:var(--ink);background:var(--surface)}
 .sp{display:inline-block;width:.55em}
 
 .tools{display:flex;gap:8px;margin:12px 0}
@@ -880,12 +883,20 @@ function makeQ(m,len,lastKey){
   }
   if(m==='rev')m='mixed';
   const P=S.pat&&PAT.find(p=>p.id===S.pat);
-  let l=P?'word':len==='mix'?rand(['word','phrase','sentence']):len,q,key;
-  for(let i=0;i<(P?80:8);i++){
+  let l=P?'word':len==='mix'?rand(['word','phrase','sentence']):len,q,key,best=null,bs=-1;
+  const F=!P&&(S.weak||store.focus!==false),T=P?80:S.weak?70:F?14:8;
+  for(let i=0;i<T;i++){
     q=l==='word'?genWord(m):l==='phrase'?genPhrase(m):genSentence(m);
     key=q.tk.map(o=>o.t).join('');
-    if(key!==lastKey&&(!P||P.re.test(q.tk.map(o=>o.r).join(''))))break;
+    if(key===lastKey)continue;
+    if(P){if(P.re.test(q.tk.map(o=>o.r).join(''))){best=q;break}continue}
+    if(!F){best=q;break}
+    const cs=qChars(q),wk=cs.filter(c=>store.ch[c]&&store.ch[c].w>0).length;
+    if(S.weak){if(wk){best=q;break}continue}
+    const v=cs.reduce((a,c)=>a+chW(c),0)/(cs.length||1)*(Math.random()*.8+.6);
+    if(v>bs){bs=v;best=q}
   }
+  q=best||q;key=q.tk.map(o=>o.t).join('');
   q.len=l;q.key=key;q.mode=m;
   return finalize(q);
 }
@@ -913,7 +924,22 @@ const PAT=[
 {id:'n',l:'ん',re:/ん/,tip:'ん dibaca "n" (contoh: しんぶん → shinbun).'},
 {id:'dk',l:'゛ ゜',re:/[がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ]/,tip:'゛ membuat bunyi bersuara (か → が); ゜ hanya pada baris は (ぱ = pa).'}];
 const missN=()=>Object.keys(store.miss).length;
+const isCh=c=>/[\u3041-\u3096\u30a1-\u30fa\u4e00-\u9fff]/.test(c);
+const qChars=q=>[...new Set([...q.tk.map(o=>o.t).join('')].filter(isCh))];
+const chW=c=>{const r=store.ch[c];return !r?1.2:r.s>=3?.1:1+2*r.w};
+const weakList=()=>Object.keys(store.ch).filter(c=>store.ch[c].w>0).sort((a,b)=>store.ch[b].w-store.ch[a].w);
+const masteredN=()=>Object.keys(store.ch).filter(c=>store.ch[c].s>=3).length;
+function updChars(ok){
+  S.newM=[];
+  const cs=qChars(S.q),inc=Math.min(1,3/(cs.length||1));
+  cs.forEach(c=>{
+    const r=store.ch[c]||(store.ch[c]={s:0,w:0});
+    if(ok===true){r.s++;if(r.s===3){r.w=0;S.newM.push(c)}else if(r.s>3)r.w=0}
+    else{r.s=0;r.w=Math.min(6,r.w+inc)}
+  });
+}
 function recMiss(ok){
+  updChars(ok);
   const q=S.q,k=q.key,m=store.miss;
   if(ok===true){if(m[k]){m[k].n--;if(m[k].n<=0)delete m[k]}}
   else if(!m[k]){if(missN()>=150)delete m[Object.keys(m)[0]];m[k]={tk:q.tk,id:q.id,m:q.mode,l:q.len,n:2}}
@@ -941,9 +967,9 @@ function typoDiff(q,said){
 }
 const S={mean:false,mode:null,len:'word',q:null,answered:false,hint:false,sess:{c:0,t:0,streak:0},
          prevStreak:0,counted:false,resultOk:null,said:'',lastKey:''};
-let store={c:0,t:0,b:0,miss:{}};
+let store={c:0,t:0,b:0,miss:{},ch:{}};
 try{const x=JSON.parse(localStorage.getItem('yomu.v1')||'null');if(x)store=Object.assign(store,x)}catch(e){}
-store.miss=store.miss||{};
+store.miss=store.miss||{};store.ch=store.ch||{};
 const save=()=>{try{localStorage.setItem('yomu.v1',JSON.stringify(store))}catch(e){}};
 
 const el={
@@ -954,9 +980,11 @@ const el={
 };
 
 function renderExtra(){
-  const n=missN();
-  $('#extra').innerHTML=(n?`<button class="revbtn" id="revBtn" type="button">🔁 Ulangi soal yang salah (${n})</button>`:'')+
+  const n=missN(),wl=weakList(),hc=`<div class="hf"><label><input type="checkbox" id="focusCb"${store.focus!==false?' checked':''}> 🎯 Fokus huruf sulit (soal memilih huruf yang belum hafal)</label><div class="hs">✅ Hafal: ${masteredN()} huruf · 📚 Dipelajari: ${Object.keys(store.ch).length}</div>${wl.length?`<div class="wk">Perlu diulang: ${wl.slice(0,10).map(c=>`<span>${esc(c)}</span>`).join('')}</div><button class="revbtn" id="weakBtn" type="button">🎯 Latih huruf sulit (${wl.length})</button>`:''}</div>`;
+  $('#extra').innerHTML=hc+(n?`<button class="revbtn" id="revBtn" type="button">🔁 Ulangi soal yang salah (${n})</button>`:'')+
   `<h2 class="lbl">3 · Latihan pola ejaan</h2><div class="chips">${PAT.map(p=>`<button type="button" data-pat="${p.id}">${p.l}</button>`).join('')}</div>`;
+  const fc=$('#focusCb');fc.onchange=()=>{store.focus=fc.checked;save()};
+  const wb=$('#weakBtn');if(wb)wb.onclick=()=>startQuiz('weak');
   const rb=$('#revBtn');if(rb)rb.onclick=()=>startQuiz('rev');
   $$('#extra .chips button').forEach(b=>b.onclick=()=>startQuiz('pat',b.dataset.pat));
 }
@@ -966,7 +994,7 @@ function renderStat(){
     ?`Total benar: <b>${store.c}</b> dari ${store.t} · Rekor beruntun: <b>${store.b}</b> 🔥 · <button id="reset" type="button">reset</button>`
     :'Jawab dengan romaji (Hepburn atau Kunrei, keduanya boleh) atau dengan suara.';
   const r=$('#reset');
-  if(r)r.onclick=()=>{if(confirm('Hapus semua statistik?')){store={c:0,t:0,b:0,miss:{}};save();renderStat()}};
+  if(r)r.onclick=()=>{if(confirm('Hapus semua statistik?')){store={c:0,t:0,b:0,miss:{},ch:{}};save();renderStat()}};
 }
 function setLen(len){
   S.len=len;
@@ -1013,9 +1041,10 @@ function nextQuestion(){
 }
 function startQuiz(mode,pat){
   if(mode==='rev'&&!missN())return;
-  S.rev=mode==='rev';S.pat=mode==='pat'?pat:null;
-  S.mode=mode==='pat'?'mixed':mode;S.sess={c:0,t:0,streak:0};S.lastKey='';
-  S.label=mode==='pat'?'パターン · '+PAT.find(p=>p.id===pat).l:mode==='rev'?'🔁 Ulangan':MODE_LABEL[mode];
+  if(mode==='weak'&&!weakList().length)return;
+  S.rev=mode==='rev';S.weak=mode==='weak';S.pat=mode==='pat'?pat:null;
+  S.mode=mode==='pat'||mode==='weak'?'mixed':mode;S.sess={c:0,t:0,streak:0};S.lastKey='';
+  S.label=mode==='pat'?'パターン · '+PAT.find(p=>p.id===pat).l:mode==='rev'?'🔁 Ulangan':mode==='weak'?'🎯 Huruf sulit':MODE_LABEL[mode];
   el.modePill.textContent=S.label;
   el.home.hidden=true;el.quiz.hidden=false;
   window.scrollTo(0,0);
@@ -1113,6 +1142,7 @@ function showResult(){
   else if(S.said)h+=`<div class="row"><span>Jawabanmu</span><b>${esc(S.said)}</b></div>`;
   const rt=q.tk.map(o=>o.r).join(''),tp=PAT.filter(p=>((p.id!=='n'&&p.id!=='dk')||S.pat===p.id)&&p.re.test(rt)).slice(0,3);
   if(tp.length)h+=`<div class="tips">${tp.map(p=>`<div>💡 <b>${p.l}</b> — ${p.tip}</div>`).join('')}</div>`;
+  if(S.newM&&S.newM.length)h+=`<div class="tips">🎉 Sudah hafal: <b>${S.newM.slice(0,8).map(esc).join(' ')}</b></div>`;
   h+=`<div class="rbtns"><button type="button" id="speak">🔊 Dengar</button>`;
   if(ok===false&&S.counted)h+=`<button type="button" id="override">Tandai benar</button>`;
   h+=`</div></div>`;
