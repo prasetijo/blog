@@ -892,7 +892,7 @@ function makeQ(m,len,lastKey){
     if(P){if(P.re.test(q.tk.map(o=>o.r).join(''))){best=q;break}continue}
     if(!F){best=q;break}
     const cs=qChars(q),wk=cs.filter(c=>store.ch[c]&&store.ch[c].w>0).length;
-    if(S.weak){if(wk){best=q;break}continue}
+    if(S.weak){if(wk&&![...key].some(c=>/[\u4e00-\u9fff\u30a1-\u30fa]/.test(c)&&!store.ch[c])){best=q;break}continue}
     const v=cs.reduce((a,c)=>a+chW(c),0)/(cs.length||1)*(Math.random()*.8+.6);
     if(v>bs){bs=v;best=q}
   }
@@ -1043,7 +1043,7 @@ function startQuiz(mode,pat){
   if(mode==='rev'&&!missN())return;
   if(mode==='weak'&&!weakList().length)return;
   S.rev=mode==='rev';S.weak=mode==='weak';S.pat=mode==='pat'?pat:null;
-  S.mode=mode==='pat'||mode==='weak'?'mixed':mode;S.sess={c:0,t:0,streak:0};S.lastKey='';
+  S.mode=mode==='pat'?'hira':mode==='weak'?'mixed':mode;S.sess={c:0,t:0,streak:0};S.lastKey='';
   S.label=mode==='pat'?'パターン · '+PAT.find(p=>p.id===pat).l:mode==='rev'?'🔁 Ulangan':mode==='weak'?'🎯 Huruf sulit':MODE_LABEL[mode];
   el.modePill.textContent=S.label;
   el.home.hidden=true;el.quiz.hidden=false;
