@@ -878,8 +878,8 @@ function finalize(q){
 }
 function charQ(c){
   let tk,id;
-  if(/[\u3041-\u3096]/.test(c)){tk=[{t:c,r:c,sf:c}];id='huruf hiragana'}
-  else if(/[\u30a1-\u30f6]/.test(c)){tk=[{t:c,r:String.fromCharCode(c.charCodeAt(0)-96),sf:c}];id='huruf katakana'}
+  if(/^[\u3041-\u3096]/.test(c)){tk=[{t:c,r:c,sf:c}];id='huruf hiragana'}
+  else if(/^[\u30a1-\u30fa]/.test(c)){tk=[{t:c,r:[...c].map(x=>x>='\u30a1'&&x<='\u30f6'?String.fromCharCode(x.charCodeAt(0)-96):x).join(''),sf:c}];id='huruf katakana'}
   else{
     let b=null;const L=w=>w.tk.map(o=>o.t).join('').length;
     for(let i=0;i<500;i++){const w=genWord('kanji');if(w.tk.some(o=>o.t.includes(c))&&(!b||L(w)<L(b)))b=w}
@@ -959,9 +959,20 @@ const PAT=[
 {id:'dk',l:'゛ ゜',re:/[がぎぐげござじずぜぞだぢづでどばびぶべぼぱぴぷぺぽ]/,tip:'゛ membuat bunyi bersuara (か → が); ゜ hanya pada baris は (ぱ = pa).'}];
 const missN=()=>Object.keys(store.miss).length;
 const isCh=c=>/[\u3041-\u3096\u30a1-\u30fa\u4e00-\u9fff]/.test(c);
-const qChars=q=>[...new Set([...q.tk.map(o=>o.t).join('')].filter(isCh))];
+function units(str){
+  const a=[...str],out=[],SP=/[ゃゅょぁぃぅぇぉゎャュョァィゥェォヮー]/;
+  for(let i=0;i<a.length;i++){
+    let u=a[i];
+    if(/[っッ]/.test(u)&&i+1<a.length)u+=a[++i];
+    while(i+1<a.length&&SP.test(a[i+1]))u+=a[++i];
+    out.push(u);
+  }
+  return out;
+}
+const SMALL1=/^[ゃゅょぁぃぅぇぉゎっャュョァィゥェォヮッ]$/;
+const qChars=q=>[...new Set(q.tk.flatMap(o=>units(o.t)).filter(isCh))];
 const chW=c=>{const r=store.ch[c];return !r?1.2:r.s>=3?.1:1+2*r.w};
-const weakList=()=>Object.keys(store.ch).filter(c=>store.ch[c].w>0).sort((a,b)=>store.ch[b].w-store.ch[a].w);
+const weakList=()=>Object.keys(store.ch).filter(c=>store.ch[c].w>0&&!SMALL1.test(c)).sort((a,b)=>store.ch[b].w-store.ch[a].w);
 const masteredN=()=>Object.keys(store.ch).filter(c=>store.ch[c].s>=3).length;
 function updChars(ok){
   S.newM=[];
