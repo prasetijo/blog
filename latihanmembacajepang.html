@@ -78,6 +78,8 @@ h1{font-size:24px;font-weight:700;margin:0;line-height:1.2}
 .hs{color:var(--muted);margin:6px 0}.wk{margin:6px 0;color:var(--muted)}
 .wk span{display:inline-block;margin:2px 4px 2px 0;padding:3px 9px;border:1px solid var(--line);border-radius:8px;font-size:18px;color:var(--ink);background:var(--surface)}
 .revbtn:disabled{opacity:.5}
+.ill{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0 4px}
+.ill .g{font-size:96px;line-height:1.15}.ill .eq{font-size:28px;color:var(--muted)}
 .sp{display:inline-block;width:.55em}
 
 .tools{display:flex;gap:8px;margin:12px 0}
@@ -899,10 +901,220 @@ function weakQ(){
   }
   return null;
 }
+const MN=`あ|Orang melambai sambil berseru "Aaa!"
+い|Dua garis berdampingan, seperti dua ikan kecil (ii)
+う|Kepala menengadah, "uuu" kebingungan
+え|Burung eksotis (E-xotic) yang sedang terbang
+お|Orang memegang bola sambil berseru "Oh!"
+か|Tangan menggapai KAcamata
+き|Bentuk KunCI (KI)
+く|Paruh burung kukuk (ku-ku)
+け|Pagar dengan KEpala miring
+こ|Dua garis seperti dua KOin bertumpuk
+さ|Orang menunduk sambil bilang "SAlam"
+し|Kail pancing, ujungnya melengkung (SHIp)
+す|Garis dengan SUlur melingkar
+せ|SEtrika dengan gagang
+そ|SOsis zig-zag
+た|Mirip huruf "t" + "a" = TA
+ち|Angka 5 gaya Jepang: CHI = lima
+つ|Gelombang TSUnami
+て|Tangan (TE = tangan)
+と|Paku menancap di jempol kaki (TOe)
+な|Orang bersimpuh berdoa: NAmu
+に|Dua garis kecil: NI = dua
+ぬ|Mi (NUdel) dengan lingkaran di ujung
+ね|Kucing (NEko) meringkuk berekor
+の|Panah memutar, seperti tanda NO
+は|HAHA: garis tawa dan lingkaran
+ひ|Wajah tersenyum lebar: HIhi
+ふ|Gunung Fuji (FU) bergaya
+へ|Gunung landai (HE)
+ほ|Seperti は dengan topi: HO-HO-HO
+ま|MAma dengan dua lengan
+み|Angka 3 (MI = tiga) bergaya
+む|Sapi "MUUU" dengan ekor melengkung
+め|Mata (ME = mata) dengan bulu mata
+も|Pancing dengan dua umpan (MOre)
+や|YAk dengan tanduk
+ゆ|Ikan (YU) berenang melingkar
+よ|YOyo dengan tali
+ら|RAjawali: kepala kecil dan sayap
+り|Dua tiang (RI) berdampingan
+る|Rute (RU) melingkar di bawah
+れ|Orang berdiri membungkuk (RE)
+ろ|Seperti る tanpa lingkaran: RO terbuka
+わ|Orang berseru "WAh!"
+を|Mirip お: partikel, dibaca o
+ん|Huruf n miring
+ア|Kapak (Ax): A
+イ|Dua goresan: iga (I-ga)
+ウ|Topi dengan titik (U)
+エ|Balok bertumpuk seperti E-skalator
+オ|Salib dengan lengkungan: Oh!
+カ|Seperti か bersudut: KAki tajam
+キ|Kunci dengan tiga garis
+ク|Paruh ayam (KU-ku)
+ケ|KErangka pagar bersudut
+コ|Sudut kotak (KOtak)
+サ|Tiga garis seperti pagar (SAgar)
+シ|Tiga titik mendatar, ujung naik: SHI tersenyum
+ス|SUper ski meluncur
+セ|SEtrika bersudut
+ソ|Dua goresan dari atas, ujung miring ke bawah
+タ|TA dengan ujung tajam
+チ|Tiga garis: CHI-cken
+ツ|Tiga goresan tegak, ujung turun: TSU
+テ|Menara TElevisi
+ト|TOtem tegak
+ナ|Salib dengan lengan: NAga
+ニ|Dua garis: NI = dua
+ヌ|Mi dengan cabang (NUdel)
+ネ|Pohon dengan ranting (NE)
+ノ|Satu garis miring: NO
+ハ|Atap dua sisi: HA
+ヒ|Sendok: HI
+フ|Kait: FU
+ヘ|Gunung landai: HE
+ホ|Pohon salib: HO
+マ|Segitiga MAta
+ミ|Tiga garis (MI = tiga)
+ム|Segitiga MU
+メ|Silang kecil: MEnyilang
+モ|Dua garis dan ekor: MOnyet
+ヤ|YAcht berlayar
+ユ|Huruf U bersudut: YU
+ヨ|Angka 3 kotak: YO
+ラ|Dua garis: RAtu
+リ|Dua garis tegak: RI
+ル|Dua kaki berjalan: RU
+レ|Huruf L: RE
+ロ|Kotak mulut: RO
+ワ|WAh: topi terbuka
+ヲ|Tiga garis: wo
+ン|Seperti ソ tapi tegak naik: N`;
+const KB=MN.split('\n').map((l,n)=>{const i=l.indexOf('|'),c=l.slice(0,i);return{c,m:l.slice(i+1),r:kanaToRomaji(c)}});
+const SIM=['シツ','ソン','ぬめ','われね','ろる','はほ','さち','いり','アマ','クタ','コユ','ヌス','ハヘ','ノメ'];
+const DAY=()=>Math.floor(Date.now()/864e5),IV=[0,1,3,7,14,30];
+const srHafal=()=>KB.filter(k=>(store.sr[k.c]||{}).b>=3).length;
+const srDue=()=>KB.filter(k=>{const r=store.sr[k.c];return r&&r.due<=DAY()}).map(k=>k.c);
+function srNew(n){
+  const seen=new Set(Object.keys(store.sr)),wk=weakList().filter(c=>!seen.has(c)&&KB.some(k=>k.c===c));
+  return[...wk,...KB.map(k=>k.c).filter(c=>!seen.has(c)&&!wk.includes(c))].slice(0,n);
+}
+function srUpd(c,perfect){
+  const r=store.sr[c]||(store.sr[c]={b:0,due:0,d:-1}),t=DAY(),h=store.ch[c]||(store.ch[c]={s:0,w:0});
+  if(perfect){if(t>=r.due&&r.d!==t){r.b=Math.min(5,r.b+1);r.d=t}if(r.b>=3){h.s=3;h.w=0}}
+  else{r.b=Math.max(0,r.b-1);r.d=t;h.s=0;h.w=Math.min(6,h.w+1)}
+  r.due=t+IV[r.b];
+}
+const IC={person:'<circle cx="24" cy="11" r="6"/><path d="M24 17v15M10 22l14-4 14 4M24 32l-9 12M24 32l9 12"/>',
+fish:'<path d="M6 24c8-12 22-12 30 0-8 12-22 12-30 0zM36 24l8-8v16z"/><circle cx="15" cy="22" r="1.5"/>',
+bird:'<path d="M6 30c8 0 14-4 18-14 3 6 9 8 16 8-5 9-14 14-26 10z"/><path d="M40 24l6-2-6-3"/>',
+ball:'<circle cx="24" cy="24" r="15"/><path d="M9 24h30M24 9c-9 8-9 22 0 30M24 9c9 8 9 22 0 30"/>',
+glasses:'<circle cx="14" cy="26" r="8"/><circle cx="34" cy="26" r="8"/><path d="M22 26h4M6 26l-2-9M42 26l2-9"/>',
+key:'<circle cx="13" cy="24" r="7"/><path d="M20 24h24M36 24v8M42 24v6"/>',
+fence:'<path d="M8 42V14l4-4 4 4v28M20 42V14l4-4 4 4v28M32 42V14l4-4 4 4v28M4 22h40M4 32h40"/>',
+coin:'<circle cx="24" cy="24" r="16"/><circle cx="24" cy="24" r="9"/>',
+hook:'<path d="M26 6v28a9 9 0 0 1-18 0M3 29l5 6 5-6"/>',
+spiral:'<path d="M24 26c-4 0-4-6 0-6s8 2 8 8-6 12-14 10"/>',
+iron:'<path d="M6 34h36l-6-16H18c-6 0-6 8-12 10zM14 40h28"/>',
+sausage:'<rect x="5" y="18" width="38" height="12" rx="6" transform="rotate(-20 24 24)"/>',
+wave:'<path d="M4 30c6-14 14-14 18 0s12 8 20-8M4 40h40"/>',
+hand:'<path d="M14 42V22M20 42V10M27 42V12M34 42V22M14 36c-5-2-8-6-6-10 2 2 6 4 6 4M12 42h26"/>',
+nail:'<path d="M8 42h30v-6c0-6-6-8-10-8h-8l-4 6z"/><path d="M34 6v16M30 6h8"/>',
+noodle:'<path d="M6 26h36c0 10-8 16-18 16S6 36 6 26zM14 20c0-6 4-6 4-12M24 20c0-6 4-6 4-12"/>',
+cat:'<path d="M10 42V18l6 4h16l6-4v24z"/><circle cx="19" cy="30" r="1.5"/><circle cx="29" cy="30" r="1.5"/><path d="M24 33v3"/>',
+arrow:'<path d="M8 24h30M28 14l10 10-10 10"/>',
+face:'<circle cx="24" cy="24" r="16"/><circle cx="18" cy="20" r="1.5"/><circle cx="30" cy="20" r="1.5"/><path d="M15 29c5 7 13 7 18 0"/>',
+mountain:'<path d="M4 40l14-26 8 12 6-8 12 22z"/>',
+hat:'<path d="M6 34h36M13 34c0-13 4-20 11-20s11 7 11 20"/>',
+cow:'<path d="M8 14c4-4 6-4 8 0h16c2-4 4-4 8 0v10l-4 4v12H14V28l-4-4z"/><circle cx="19" cy="22" r="1.5"/><circle cx="29" cy="22" r="1.5"/>',
+eye:'<path d="M3 24c10-14 32-14 42 0-10 14-32 14-42 0z"/><circle cx="24" cy="24" r="6"/>',
+rod:'<path d="M6 42L36 8M36 8c8 4 8 18 0 22"/>',
+horns:'<path d="M6 8c0 14 6 20 18 20S42 22 42 8M24 28v14"/>',
+yoyo:'<circle cx="24" cy="32" r="10"/><path d="M24 4v18"/>',
+poles:'<path d="M16 6v36M32 6v36"/>',
+route:'<path d="M8 42c0-12 14-8 14-20S36 14 36 6"/>',
+axe:'<path d="M14 44L32 6M26 8c8 0 14 6 14 14-6 0-10-4-14-14z"/>',
+stairs:'<path d="M4 42h10V32h10V22h10V12h10"/>',
+tower:'<path d="M24 4v8M14 44l10-32 10 32M17 32h14M20 22h8"/>',
+cross:'<path d="M24 6v36M10 20h28"/>',
+spoon:'<ellipse cx="24" cy="14" rx="8" ry="10"/><path d="M24 24v20"/>',
+triangle:'<path d="M24 8L6 40h36z"/>',
+box:'<rect x="8" y="12" width="32" height="24"/>',
+yacht:'<path d="M24 6v28M24 8l14 22H24M6 36h36l-6 8H12z"/>',
+ski:'<path d="M4 34l40 6M12 26l8-14M30 20l8 12"/>',
+slash:'<path d="M36 6L12 42"/>',
+roof:'<path d="M6 38L24 10l18 28"/>',
+L:'<path d="M14 6v34h24"/>',
+two:'<path d="M10 18h28M10 32h28"/>',
+three:'<path d="M10 12h28M10 24h28M10 36h28"/>',
+tree:'<path d="M24 44V22M24 6L12 28h24z"/>'};
+const IM=`あ person,い fish,う face,え bird,お ball,か glasses,き key,く bird,け fence,こ coin,さ person,し hook,す spiral,せ iron,そ sausage,た #ta,ち #5,つ wave,て hand,と nail,な person,に two,ぬ noodle,ね cat,の arrow,は face,ひ face,ふ mountain,へ mountain,ほ hat,ま person,み #3,む cow,め eye,も rod,や horns,ゆ fish,よ yoyo,ら bird,り poles,る route,れ person,ろ route,わ person,を #o,ん #n,ア axe,イ slash,ウ hat,エ stairs,オ cross,カ slash,キ key,ク bird,ケ fence,コ box,サ fence,シ face,ス ski,セ iron,ソ slash,タ #ta,チ bird,ツ poles,テ tower,ト cross,ナ cross,ニ two,ヌ noodle,ネ tree,ノ slash,ハ roof,ヒ spoon,フ hook,ヘ mountain,ホ cross,マ triangle,ミ #3,ム triangle,メ cross,モ face,ヤ yacht,ユ L,ヨ #3,ラ two,リ poles,ル poles,レ L,ロ box,ワ hat,ヲ three,ン slash`.split(',').reduce((o,x)=>{const[a,b]=x.split(' ');o[a]=b;return o},{});
+function ico(c){
+  const k=IM[c];if(!k)return'';
+  const g=k[0]==='#'?`<text x="24" y="33" font-size="26" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none">${k.slice(1)}</text>`:IC[k];
+  return`<svg viewBox="0 0 48 48" width="96" height="96" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)">${g}</svg>`;
+}
+const illus=c=>`<div class="ill"><span class="g">${c}</span>${IM[c]?`<span class="eq">≈</span>${ico(c)}`:''}</div>`;
+function learn(mode){
+  const chars=mode==='due'?srDue().slice(0,8):srNew(5);
+  if(!chars.length)return;
+  const L={ph:mode==='due'?'type':'intro',q:[],i:0,res:{},fb:null},sh=a=>[...a].sort(()=>Math.random()-.5);
+  chars.forEach(c=>L.res[c]=true);
+  const ov=document.createElement('div');
+  ov.style.cssText='position:fixed;inset:0;background:var(--bg,#fbfcfb);z-index:90;overflow:auto;padding:18px;display:flex;justify-content:center';
+  document.body.appendChild(ov);
+  const info=c=>KB.find(k=>k.c===c),title=mode==='due'?'Ulas hari ini':'Belajar huruf baru';
+  const ex=c=>{const e=N.find(e=>!e.k&&((e.h&&e.h.includes(c))||(e.c&&e.c.includes(c))));return e?`Contoh: <b>${esc(e.c||e.h)}</b> = ${esc(e.id)}`:''};
+  const sim=c=>{const g=SIM.find(g=>g.includes(c));return g?`<div style="color:var(--bad);font-size:13px;margin-top:6px">Mirip dengan: ${[...g].filter(x=>x!==c).join(' ')}</div>`:''};
+  const box=h=>{ov.innerHTML=`<div style="width:100%;max-width:420px;text-align:center"><div style="display:flex;justify-content:space-between;align-items:center"><b>${title}</b><button id="lx" type="button" class="revbtn" style="width:auto;margin:0;padding:8px 14px">✕</button></div>${h}</div>`;ov.querySelector('#lx').onclick=()=>{ov.remove();renderStat()}};
+  const big=c=>`<div style="font-size:96px;line-height:1.15;margin:14px 0 4px">${c}</div>`;
+  const mnem=c=>`<div style="background:var(--surface);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:14px;padding:12px;margin:10px 0;font-size:14.5px;line-height:1.5;text-align:left">${esc(info(c).m)}</div>`;
+  function opts(c){
+    const k=info(c),g=SIM.find(g=>g.includes(c))||'',pool=[...[...g].filter(x=>x!==c),...sh(KB.filter(x=>/[ぁ-ん]/.test(c)===/[ぁ-ん]/.test(x.c)).map(x=>x.c))];
+    const out=[k.r];
+    for(const x of pool){const r=info(x)&&info(x).r;if(r&&!out.includes(r))out.push(r);if(out.length>=4)break}
+    return sh(out);
+  }
+  function next(){L.fb=null;L.i++;if(L.i>=L.q.length){if(L.ph==='mc'){L.ph='type';L.q=sh(chars);L.i=0}else L.ph='done'}R()}
+  function answer(c,ok,given){
+    if(!ok){L.res[c]=false;L.q.push(c)}
+    L.fb={ok,given};R();
+  }
+  function R(){
+    const c=L.q[L.i];
+    if(L.ph==='intro'){
+      const k=info(chars[L.i]),last=L.i===chars.length-1;
+      box(`<div style="color:var(--muted);font-size:13px;margin-top:10px">Huruf ${L.i+1} / ${chars.length}</div>${illus(k.c)}<div style="font-size:28px;font-weight:800">${k.r}</div>${mnem(k.c)}<div style="font-size:14px;color:var(--muted)">${ex(k.c)}</div>${sim(k.c)}<button id="ln" type="button" class="revbtn">${last?'Mulai tes →':'Lanjut →'}</button>`);
+      ov.querySelector('#ln').onclick=()=>{if(last){L.ph='mc';L.q=sh(chars);L.i=0}else L.i++;R()};
+    }else if(L.ph==='done'){
+      chars.forEach(x=>srUpd(x,L.res[x]));save();
+      const rows=chars.map(x=>{const r=store.sr[x],d=Math.max(0,r.due-DAY());return`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)"><span style="font-size:22px">${x} <small>${info(x).r}</small></span><span>${L.res[x]?'Benar':'Salah'} <small style="color:var(--muted)">ulas ${d?d+' hari lagi':'hari ini lagi'}</small></span></div>`}).join('');
+      box(`<h3 style="margin:16px 0 6px">Sesi selesai</h3><div style="text-align:left">${rows}</div><div class="hs">Hafal permanen: ${srHafal()}/${KB.length} huruf</div><button id="ld" type="button" class="revbtn">Selesai</button>`);
+      ov.querySelector('#ld').onclick=()=>{ov.remove();renderStat()};
+      FX.win(chars.every(x=>L.res[x])?3:1);
+    }else if(L.fb){
+      const k=info(c),f=L.fb;
+      box(`${f.ok?big(c):illus(c)}<div style="font-size:22px;font-weight:800;color:var(--${f.ok?'ok':'bad'})">${f.ok?'Benar':'Belum tepat'}</div><div style="font-size:26px;margin:6px 0">${c} = <b>${k.r}</b></div>${f.ok?'':`<div style="color:var(--muted)">Jawabanmu: ${esc(f.given||'-')}</div>${mnem(c)}${sim(c)}`}<button id="ln" type="button" class="revbtn">Lanjut →</button>`);
+      ov.querySelector('#ln').onclick=next;
+    }else if(L.ph==='mc'){
+      box(`<div style="color:var(--muted);font-size:13px;margin-top:10px">Tes 1: pilih bacaan (${L.i+1}/${L.q.length})</div>${big(c)}<div class="chips" style="justify-content:center;margin-top:8px">${opts(c).map(o=>`<button type="button" data-o="${o}" style="font-size:20px;padding:12px 22px">${o}</button>`).join('')}</div>`);
+      ov.querySelectorAll('[data-o]').forEach(b=>b.onclick=()=>answer(c,b.dataset.o===info(c).r,b.dataset.o));
+    }else{
+      box(`<div style="color:var(--muted);font-size:13px;margin-top:10px">${mode==='due'?'Ulas':'Tes 2'}: ketik bacaan (${L.i+1}/${L.q.length})</div>${big(c)}<input id="li" autocomplete="off" autocapitalize="none" style="width:100%;font-size:22px;text-align:center;padding:12px;border:1px solid var(--line);border-radius:12px;margin-top:8px"><button id="lk" type="button" class="revbtn">Cek</button>`);
+      const inp=ov.querySelector('#li'),go=()=>{const v=inp.value.trim().toLowerCase().replace(/\s/g,'');if(v)answer(c,vars(c,'').includes(v),v)};
+      ov.querySelector('#lk').onclick=go;inp.onkeydown=e=>{if(e.key==='Enter')go()};inp.focus();
+    }
+  }
+  if(L.ph==='type')L.q=sh(chars);
+  R();
+}
 function showDone(kind){
   const d=document.createElement('div');
   d.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);display:flex;align-items:center;justify-content:center;z-index:100;padding:24px';
-  d.innerHTML=`<div style="background:var(--surface,#fff);border-radius:18px;padding:24px;max-width:340px;width:100%;text-align:center"><div style="font-size:44px">🎉</div><h3 style="margin:8px 0">${kind==='weak'?'Latih huruf sulit selesai!':'Soal yang salah sudah habis!'}</h3><p style="color:var(--muted);margin:0 0 6px">${kind==='weak'?'Semua huruf sulit sudah kamu hafal.':'Semua soal yang salah sudah kamu jawab benar.'} Daftar ini terisi lagi kalau kamu berlatih hiragana, katakana, atau kanji dan masih ada yang salah.</p><button class="revbtn" id="doneOk" type="button">Kembali ke beranda</button></div>`;
+  d.innerHTML=`<div style="background:var(--surface,#fff);border-radius:18px;padding:24px;max-width:340px;width:100%;text-align:center"><h3 style="margin:8px 0">${kind==='weak'?'Latih huruf sulit selesai!':'Soal yang salah sudah habis!'}</h3><p style="color:var(--muted);margin:0 0 6px">${kind==='weak'?'Semua huruf sulit sudah kamu hafal.':'Semua soal yang salah sudah kamu jawab benar.'} Daftar ini terisi lagi kalau kamu berlatih hiragana, katakana, atau kanji dan masih ada yang salah.</p><button class="revbtn" id="doneOk" type="button">Kembali ke beranda</button></div>`;
   document.body.appendChild(d);
   d.querySelector('#doneOk').onclick=()=>{d.remove();goHome()};
   FX.win(5);
@@ -1066,9 +1278,9 @@ function typoDiff(q,said){
 }
 const S={mean:false,mode:null,len:'word',q:null,answered:false,hint:false,sess:{c:0,t:0,streak:0},
          prevStreak:0,counted:false,resultOk:null,said:'',lastKey:''};
-let store={c:0,t:0,b:0,miss:{},ch:{}};
+let store={c:0,t:0,b:0,miss:{},ch:{},sr:{}};
 try{const x=JSON.parse(localStorage.getItem('yomu.v1')||'null');if(x)store=Object.assign(store,x)}catch(e){}
-store.miss=store.miss||{};store.ch=store.ch||{};
+store.miss=store.miss||{};store.ch=store.ch||{};store.sr=store.sr||{};
 const save=()=>{try{localStorage.setItem('yomu.v1',JSON.stringify(store))}catch(e){}};
 
 const el={
@@ -1080,9 +1292,11 @@ const el={
 
 function renderExtra(){
   const n=missN(),wl=weakList(),hc=`<div class="hf"><label><input type="checkbox" id="focusCb"${store.focus!==false?' checked':''}> 🎯 Fokus huruf sulit (soal memilih huruf yang belum hafal)</label><div class="hs">✅ Hafal: ${masteredN()} huruf · 📚 Dipelajari: ${Object.keys(store.ch).length}</div>${wl.length?`<div class="wk">Perlu diulang: ${wl.slice(0,10).map(c=>`<span>${esc(c)}</span>`).join('')}</div>`:''}<button class="revbtn" id="weakBtn" type="button"${wl.length?'':' disabled'}>${wl.length?`🎯 Latih huruf sulit (${wl.length} huruf)`:'✅ Tidak ada huruf sulit'}</button></div>`;
-  $('#extra').innerHTML=hc+`<button class="revbtn" id="revBtn" type="button"${n?'':' disabled'}>${n?`🔁 Ulangi soal yang salah (${n})`:'✅ Tidak ada soal yang salah'}</button>`+
+  const due=srDue().length,nw=srNew(5).length,lr=`<div class="hf"><h2 class="lbl">Belajar huruf (pemula)</h2><div class="hs">Hafal permanen: ${srHafal()}/${KB.length} huruf (benar di hari yang berbeda)</div><button class="revbtn" id="lnBtn" type="button"${nw?'':' disabled'}>Belajar huruf baru${nw?` (${nw})`:''}</button><button class="revbtn" id="ldBtn" type="button"${due?'':' disabled'}>Ulas hari ini (${due})</button></div>`;
+  $('#extra').innerHTML=lr+hc+`<button class="revbtn" id="revBtn" type="button"${n?'':' disabled'}>${n?`🔁 Ulangi soal yang salah (${n})`:'✅ Tidak ada soal yang salah'}</button>`+
   `<h2 class="lbl">3 · Latihan pola ejaan</h2><div class="chips">${PAT.map(p=>`<button type="button" data-pat="${p.id}">${p.l}</button>`).join('')}</div>`;
   const fc=$('#focusCb');fc.onchange=()=>{store.focus=fc.checked;save()};
+  $('#lnBtn').onclick=()=>learn('new');$('#ldBtn').onclick=()=>learn('due');
   $('#weakBtn').onclick=()=>startQuiz('weak');
   $('#revBtn').onclick=()=>startQuiz('rev');
   $$('#extra .chips button').forEach(b=>b.onclick=()=>startQuiz('pat',b.dataset.pat));
@@ -1093,7 +1307,7 @@ function renderStat(){
     ?`Total benar: <b>${store.c}</b> dari ${store.t} · Rekor beruntun: <b>${store.b}</b> 🔥 · <button id="reset" type="button">reset</button>`
     :'Jawab dengan romaji (Hepburn atau Kunrei, keduanya boleh) atau dengan suara.';
   const r=$('#reset');
-  if(r)r.onclick=()=>{if(confirm('Hapus semua statistik?')){store={c:0,t:0,b:0,miss:{},ch:{}};save();renderStat()}};
+  if(r)r.onclick=()=>{if(confirm('Hapus semua statistik?')){store={c:0,t:0,b:0,miss:{},ch:{},sr:{}};save();renderStat()}};
 }
 function setLen(len){
   S.len=len;
