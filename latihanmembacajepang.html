@@ -1004,7 +1004,7 @@ function srNew(n){
 }
 function srUpd(c,perfect){
   const r=store.sr[c]||(store.sr[c]={b:0,due:0,d:-1}),t=DAY(),h=store.ch[c]||(store.ch[c]={s:0,w:0});
-  if(perfect){if(t>=r.due&&r.d!==t){r.b=Math.min(5,r.b+1);r.d=t}if(r.b>=3){h.s=3;h.w=0}}
+  if(perfect){if(t>=r.due&&(r.d!==t||r.b===0)){r.b=Math.min(5,r.b+1);r.d=t}if(r.b>=3){h.s=3;h.w=0}}
   else{r.b=Math.max(0,r.b-1);r.d=t;h.s=0;h.w=Math.min(6,h.w+1)}
   r.due=t+IV[r.b];
 }
