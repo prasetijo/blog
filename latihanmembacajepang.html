@@ -57,6 +57,9 @@ h1{font-size:24px;font-weight:700;margin:0;line-height:1.2}
 .pill{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700}
 .score{margin-left:auto;font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap}
 
+.qcard.wrong{background:#ffb066;border-color:#ffb066;box-shadow:none}
+.qcard.shake{animation:shk .5s}
+@keyframes shk{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(6px)}30%,50%,70%{transform:translateX(-10px)}40%,60%{transform:translateX(10px)}}
 .qcard{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:36px 16px;
   text-align:center;box-shadow:var(--shadow);min-height:190px;display:flex;align-items:center;justify-content:center}
 .qtext{font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
@@ -624,6 +627,344 @@ const N=rows(`
 ||コップ|gelas|
 ||スプーン|sendok|
 ||フォーク|garpu|
+牛|うし||sapi|
+馬|うま||kuda|
+豚|ぶた||babi|
+羊|ひつじ||domba|
+鶏|にわとり||ayam|
+虫|むし||serangga|
+蚊|か||nyamuk|
+蝶|ちょう||kupu-kupu|
+蜂|はち||lebah|
+蛇|へび||ular|
+蛙|かえる||katak|
+熊|くま||beruang|
+猿|さる||monyet|
+狐|きつね||rubah|
+鹿|しか||rusa|
+象|ぞう||gajah|
+虎|とら||harimau|
+兎|うさぎ||kelinci|
+亀|かめ||kura-kura|
+蟹|かに||kepiting|
+烏|からす||gagak|
+雀|すずめ||burung pipit|
+中国|ちゅうごく||Tiongkok|
+韓国|かんこく||Korea Selatan|
+外国|がいこく||luar negeri|
+||イタリア|Italia|
+||スペイン|Spanyol|
+||ロシア|Rusia|
+||インド|India|
+||タイ|Thailand|
+||ベトナム|Vietnam|
+||フィリピン|Filipina|
+||カナダ|Kanada|
+||ブラジル|Brasil|
+北|きた||utara|
+南|みなみ||selatan|
+西|にし||barat|
+右|みぎ||kanan|
+左|ひだり||kiri|
+縦|たて||vertikal|
+横|よこ||samping|
+中央|ちゅうおう||pusat|
+今夜|こんや||malam ini|
+今年|ことし||tahun ini|
+来年|らいねん||tahun depan|
+去年|きょねん||tahun lalu|
+先月|せんげつ||bulan lalu|
+今月|こんげつ||bulan ini|
+来月|らいげつ||bulan depan|
+午前|ごぜん||pagi (AM)|
+午後|ごご||siang/sore (PM)|
+夕方|ゆうがた||sore hari|
+昼間|ひるま||siang hari|
+真夜中|まよなか||tengah malam|
+平日|へいじつ||hari kerja|
+祝日|しゅくじつ||hari libur nasional|
+授業|じゅぎょう||pelajaran|
+宿題|しゅくだい||pekerjaan rumah|
+試験|しけん||ujian|
+成績|せいせき||nilai|
+教室|きょうしつ||ruang kelas|
+黒板|こくばん||papan tulis|
+教科書|きょうかしょ||buku pelajaran|
+先輩|せんぱい||senior|
+後輩|こうはい||junior|
+同僚|どうりょう||rekan kerja|
+上司|じょうし||atasan|
+部下|ぶか||bawahan|
+出張|しゅっちょう||perjalanan dinas|
+書類|しょるい||dokumen|
+資料|しりょう||materi|
+履歴書|りれきしょ||CV|
+面接|めんせつ||wawancara|
+契約|けいやく||kontrak|
+事務所|じむしょ||kantor|
+工場|こうじょう||pabrik|
+倉庫|そうこ||gudang|
+店長|てんちょう||manajer toko|
+制服|せいふく||seragam|
+名札|なふだ||papan nama|
+休憩|きゅうけい||istirahat|
+出勤|しゅっきん||masuk kerja|
+退勤|たいきん||pulang kerja|
+勤務|きんむ||dinas|
+当番|とうばん||giliran tugas|
+清掃|せいそう||pembersihan|
+点検|てんけん||pemeriksaan|
+備品|びひん||perlengkapan|
+洗剤|せんざい||deterjen|
+漂白剤|ひょうはくざい||pemutih|
+|ほうき||sapu|
+|ちりとり||pengki|
+||バケツ|ember|
+||モップ|pel|
+||ゴム|karet|
+宿|やど||penginapan|
+旅館|りょかん||penginapan Jepang|
+温泉|おんせん||pemandian air panas|
+浴衣|ゆかた||yukata|
+畳|たたみ||tatami|
+和室|わしつ||kamar gaya Jepang|
+洋室|ようしつ||kamar gaya Barat|
+空室|くうしつ||kamar kosong|
+満室|まんしつ||kamar penuh|
+領収書|りょうしゅうしょ||kuitansi|
+忘れ物|わすれもの||barang tertinggal|
+落とし物|おとしもの||barang jatuh|
+案内|あんない||panduan|
+観光|かんこう||wisata|
+観光客|かんこうきゃく||turis|
+出口|でぐち||pintu keluar|
+入口|いりぐち||pintu masuk|
+非常口|ひじょうぐち||pintu darurat|
+禁煙|きんえん||dilarang merokok|
+喫煙|きつえん||merokok|
+故障|こしょう||rusak|
+修理|しゅうり||perbaikan|
+苦情|くじょう||keluhan|
+注意|ちゅうい||perhatian|
+危険|きけん||bahaya|
+安全|あんぜん||keamanan|
+清潔|せいけつ||bersih|
+汚れ|よごれ||kotoran|
+匂い|におい||bau|
+騒音|そうおん||kebisingan|
+熱|ねつ||demam|
+咳|せき||batuk|
+痛み|いたみ||rasa sakit|
+怪我|けが||luka|
+保険|ほけん||asuransi|
+救急車|きゅうきゅうしゃ||ambulans|
+注射|ちゅうしゃ||suntikan|
+検査|けんさ||pemeriksaan|
+鶏肉|とりにく||daging ayam|
+豚肉|ぶたにく||daging babi|
+牛肉|ぎゅうにく||daging sapi|
+海老|えび||udang|
+胡椒|こしょう||merica|
+味噌汁|みそしる||sup miso|
+漬物|つけもの||acar|
+焼肉|やきにく||daging panggang|
+丼|どんぶり||mangkuk nasi besar|
+緑茶|りょくちゃ||teh hijau|
+紅茶|こうちゃ||teh hitam|
+氷|こおり||es|
+湯|ゆ||air panas|
+朝ご飯|あさごはん||sarapan|
+昼ご飯|ひるごはん||makan siang|
+晩ご飯|ばんごはん||makan malam|
+屋台|やたい||kios makanan|
+居酒屋|いざかや||kedai minum|
+食堂|しょくどう||kantin|
+喫茶店|きっさてん||kedai kopi|
+携帯|けいたい||ponsel|
+画面|がめん||layar|
+充電|じゅうでん||mengisi daya|
+電池|でんち||baterai|
+番号|ばんごう||nomor|
+住所|じゅうしょ||alamat|
+年齢|ねんれい||usia|
+国籍|こくせき||kewarganegaraan|
+職業|しょくぎょう||pekerjaan|
+政治|せいじ||politik|
+経済|けいざい||ekonomi|
+社会|しゃかい||masyarakat|
+文化|ぶんか||budaya|
+歴史|れきし||sejarah|
+法律|ほうりつ||hukum|
+戦争|せんそう||perang|
+平和|へいわ||perdamaian|
+自然|しぜん||alam|
+環境|かんきょう||lingkungan|
+災害|さいがい||bencana|
+地震|じしん||gempa bumi|
+台風|たいふう||topan|
+津波|つなみ||tsunami|
+火事|かじ||kebakaran|
+事故|じこ||kecelakaan|
+事件|じけん||kasus|
+警察|けいさつ||polisi|
+消防|しょうぼう||pemadam kebakaran|
+気温|きおん||suhu udara|
+改札|かいさつ||gerbang tiket|
+乗り場|のりば||tempat naik|
+運転|うんてん||mengemudi|
+免許|めんきょ||SIM|
+歩道|ほどう||trotoar|
+交差点|こうさてん||persimpangan|
+渋滞|じゅうたい||kemacetan|
+高速|こうそく||jalan tol|
+片道|かたみち||sekali jalan|
+往復|おうふく||pulang pergi|
+時刻表|じこくひょう||jadwal|
+遅刻|ちこく||terlambat|
+出発|しゅっぱつ||keberangkatan|
+到着|とうちゃく||kedatangan|
+小説|しょうせつ||novel|
+漫画|まんが||komik|
+絵|え||gambar|
+散歩|さんぽ||jalan santai|
+旅行|りょこう||perjalanan wisata|
+料理|りょうり||masakan|
+掃除|そうじ||bersih-bersih|
+買い物|かいもの||belanja|
+運動|うんどう||olahraga|
+水泳|すいえい||renang|
+登山|とざん||mendaki gunung|
+釣り|つり||memancing|
+花見|はなみ||melihat bunga|
+祭り|まつり||festival|
+花火|はなび||kembang api|
+将棋|しょうぎ||catur Jepang|
+相撲|すもう||sumo|
+柔道|じゅうどう||judo|
+空手|からて||karate|
+剣道|けんどう||kendo|
+着物|きもの||kimono|
+漢字|かんじ||kanji|
+俳句|はいく||haiku|
+歌舞伎|かぶき||kabuki|
+茶道|さどう||upacara teh|
+親友|しんゆう||sahabat|
+家族|かぞく||keluarga|
+家庭|かてい||rumah tangga|
+両方|りょうほう||keduanya|
+全部|ぜんぶ||semua|
+半分|はんぶん||setengah|
+最初|さいしょ||pertama|
+最後|さいご||terakhir|
+将来|しょうらい||masa depan|
+過去|かこ||masa lalu|
+現在|げんざい||sekarang|
+未来|みらい||masa depan|
+方法|ほうほう||cara|
+場所|ばしょ||tempat|
+世界|せかい||dunia|
+生活|せいかつ||kehidupan|
+人生|じんせい||hidup|
+健康|けんこう||kesehatan|
+||パスタ|pasta|
+||サンドイッチ|sandwich|
+||ハム|ham|
+||ソーセージ|sosis|
+||ポテト|kentang|
+||オムレツ|omelet|
+||リンス|kondisioner|
+||ポケット|saku|
+||スーツケース|koper|
+||リュック|ransel|
+||バッグ|tas|
+||パスポート|paspor|
+||チケット|tiket|
+||カード|kartu|
+||レシート|struk|
+||サイン|tanda tangan|
+||ルール|aturan|
+||マナー|sopan santun|
+||サービス|layanan|
+||チェックイン|check-in|
+||チェックアウト|check-out|
+||フロント|resepsionis|
+||ロビー|lobi|
+||キー|kunci|
+||ルームサービス|layanan kamar|
+||バイキング|prasmanan|
+||メニュー|menu|
+||ウェイター|pelayan|
+||オーナー|pemilik|
+||マネージャー|manajer|
+||スタッフ|staf|
+||ユニフォーム|seragam|
+||パート|kerja paruh waktu|
+||シフト|shift|
+||スケジュール|jadwal|
+||ミーティング|pertemuan|
+||データ|data|
+||ファイル|berkas|
+||パスワード|kata sandi|
+||アプリ|aplikasi|
+||ビデオ|video|
+||バイオリン|biola|
+||ドラム|drum|
+||マイク|mikrofon|
+||スピーカー|pengeras suara|
+||イヤホン|earphone|
+||チャンネル|saluran|
+||ヒーロー|pahlawan|
+||スター|bintang|
+||ファン|penggemar|
+||チーム|tim|
+||コーチ|pelatih|
+||ヒーター|pemanas|
+||ストーブ|kompor|
+||ライト|lampu|
+||スイッチ|sakelar|
+||コンセント|stopkontak|
+||ケーブル|kabel|
+||バッテリー|baterai|
+||プリンター|printer|
+||コピー|salinan|
+||ハサミ|gunting|
+||テープ|selotip|
+||ボールペン|pulpen|
+||カレンダー|kalender|
+||ポスター|poster|
+||アルバム|album|
+||ガソリン|bensin|
+||エンジン|mesin|
+||タイヤ|ban|
+||ブレーキ|rem|
+||ハンドル|setir|
+||スピード|kecepatan|
+||トラック|truk|
+||バイク|sepeda motor|
+||ヘルメット|helm|
+||ガイド|pemandu|
+||ツアー|tur|
+||マップ|peta|
+||ベンチ|bangku|
+||トンネル|terowongan|
+||エスカレーター|eskalator|
+||ガラス|kaca|
+||プラスチック|plastik|
+||ビニール|vinil|
+||メロン|melon|
+||パイナップル|nanas|
+||キウイ|kiwi|
+||マンゴー|mangga|
+||アボカド|alpukat|
+||ピーマン|paprika hijau|
+||キャベツ|kubis|
+||レタス|selada|
+||ブロッコリー|brokoli|
+||カボチャ|labu|
+|ほうれんそう||bayam|
+|ねぎ||daun bawang|
+|だいこん||lobak|
+|なす||terong|
 `,([k,h,c,id,cats])=>({k,h:h||kataToHira(c),c,id,cats:(cats||'').split(',').filter(Boolean)}));
 
 /* Kata kerja: kanji | bacaan kanji | okurigana bentuk ます | okurigana bentuk kamus | arti | kategori */
@@ -1292,7 +1633,7 @@ const el={
 
 function renderExtra(){
   const n=missN(),wl=weakList(),hc=`<div class="hf"><label><input type="checkbox" id="focusCb"${store.focus!==false?' checked':''}> 🎯 Fokus huruf sulit (soal memilih huruf yang belum hafal)</label><div class="hs">✅ Hafal: ${masteredN()} huruf · 📚 Dipelajari: ${Object.keys(store.ch).length}</div>${wl.length?`<div class="wk">Perlu diulang: ${wl.slice(0,10).map(c=>`<span>${esc(c)}</span>`).join('')}</div>`:''}<button class="revbtn" id="weakBtn" type="button"${wl.length?'':' disabled'}>${wl.length?`🎯 Latih huruf sulit (${wl.length} huruf)`:'✅ Tidak ada huruf sulit'}</button></div>`;
-  const due=srDue().length,nw=srNew(5).length,lr=`<div class="hf"><h2 class="lbl">Belajar huruf (pemula)</h2><div class="hs">Hafal permanen: ${srHafal()}/${KB.length} huruf (benar di hari yang berbeda)</div><button class="revbtn" id="lnBtn" type="button"${nw?'':' disabled'}>Belajar huruf baru${nw?` (${nw})`:''}</button><button class="revbtn" id="ldBtn" type="button"${due?'':' disabled'}>Ulas hari ini (${due})</button></div>`;
+  const due=srDue().length,nw=srNew(5).length,lr=`<div class="hf"><h2 class="lbl">Belajar huruf (pemula)</h2><div class="hs">Hafal permanen: ${srHafal()}/${KB.length} huruf (benar di 3 hari berbeda) · Sedang dipelajari: ${Object.keys(store.sr).length}</div><button class="revbtn" id="lnBtn" type="button"${nw?'':' disabled'}>Belajar huruf baru${nw?` (${nw})`:''}</button><button class="revbtn" id="ldBtn" type="button"${due?'':' disabled'}>Ulas hari ini (${due})</button></div>`;
   $('#extra').innerHTML=lr+hc+`<button class="revbtn" id="revBtn" type="button"${n?'':' disabled'}>${n?`🔁 Ulangi soal yang salah (${n})`:'✅ Tidak ada soal yang salah'}</button>`+
   `<h2 class="lbl">3 · Latihan pola ejaan</h2><div class="chips">${PAT.map(p=>`<button type="button" data-pat="${p.id}">${p.l}</button>`).join('')}</div>`;
   const fc=$('#focusCb');fc.onchange=()=>{store.focus=fc.checked;save()};
@@ -1316,7 +1657,7 @@ function setLen(len){
 function updateScore(){
   el.score.textContent=`✓ ${S.sess.c}/${S.sess.t}`+(S.sess.streak>1?` · 🔥${S.sess.streak}`:'');
 }
-const KM={"丁":"blok","両":"kedua","中":"tengah","乳":"susu","予":"sebelumnya","井":"sumur","交":"bersilang","付":"menempel","体":"tubuh","信":"percaya","刺":"menusuk","包":"membungkus","医":"pengobatan","卵":"telur","受":"menerima","台":"landasan","号":"nomor","司":"mengurus","呂":"bak","喉":"tenggorokan","噌":"miso","団":"kelompok","城":"kastel","場":"tempat","塩":"garam","壁":"dinding","声":"suara","夕":"petang","夢":"mimpi","婦":"istri","官":"pejabat","客":"tamu","室":"ruangan","容":"isi","密":"rapat","寺":"kuil","寿":"umur panjang","局":"kantor","島":"pulau","巾":"kain","市":"kota","帽":"topi","幹":"batang","床":"lantai","廊":"koridor","弁":"katup","弟":"adik lk.","当":"mengena","彼":"dia","恋":"cinta","意":"maksud","慣":"terbiasa","所":"tempat","扉":"pintu","指":"jari","昼":"siang","服":"pakaian","末":"ujung","束":"ikat","来":"datang","枕":"bantal","林":"hutan kecil","柑":"jeruk","桜":"sakura","森":"hutan","業":"pekerjaan","橋":"jembatan","機":"mesin","檎":"apel","歯":"gigi","残":"sisa","段":"tingkat","毛":"bulu","汗":"keringat","池":"kolam","油":"minyak","波":"ombak","洗":"mencuci","浴":"mandi","涙":"air mata","港":"pelabuhan","湖":"danau","濯":"membilas","火":"api","爪":"kuku","牛":"sapi","玄":"gelap","由":"sebab","番":"giliran","皿":"piring","眼":"mata","石":"batu","砂":"pasir","碗":"mangkuk","祖":"leluhur","神":"dewa","秘":"rahasia","竹":"bambu","筆":"kuas","答":"menjawab","箸":"sumpit","米":"beras","糖":"gula","約":"janji","経":"melewati","給":"memberi","線":"garis","者":"orang","肩":"bahu","背":"punggung","腐":"busuk","腕":"lengan","腹":"perut","膝":"lutut","自":"diri","舌":"lidah","草":"rumput","荷":"muatan","菓":"camilan","薬":"obat","虹":"pelangi","蜜":"madu","血":"darah","計":"mengukur","誕":"lahir","警":"waspada","議":"berunding","豆":"kacang","趣":"selera","身":"badan","転":"berputar","辞":"kata","週":"pekan","郵":"pos","醤":"kecap","金":"emas","鉄":"besi","鉛":"timah","銀":"perak","鍋":"panci","鍵":"kunci","鏡":"cermin","関":"hubungan","階":"lantai","隣":"tetangga","雲":"awan","雷":"petir","靴":"sepatu","鞄":"tas","頭":"kepala","題":"judul","風":"angin","飛":"terbang","餅":"kue beras","首":"leher","駐":"berhenti","験":"menguji","骨":"tulang","髪":"rambut","鹸":"sabun","麺":"mi","多":"banyak","丈":"kokoh","上":"atas","下":"bawah","乗":"naik","事":"urusan","京":"ibu kota","人":"orang","今":"sekarang","仕":"melayani","休":"istirahat","会":"bertemu","作":"membuat","使":"memakai","供":"menyertai","便":"praktis","傘":"payung","元":"asal","兄":"kakak lk.","先":"dulu","入":"masuk","公":"umum","写":"menyalin","冬":"musim dingin","出":"keluar","切":"memotong","利":"manfaat","前":"depan","力":"tenaga","勉":"berusaha","動":"bergerak","友":"teman","口":"mulut","古":"lama","合":"cocok","名":"nama","味":"rasa","員":"anggota","問":"pertanyaan","図":"gambar","国":"negara","園":"taman","地":"tanah","夏":"musim panas","夜":"malam","大":"besar","天":"langit","夫":"suami","女":"perempuan","好":"suka","姉":"kakak pr.","嬉":"gembira","子":"anak","字":"aksara","学":"belajar","安":"murah","家":"rumah","寒":"dingin","寝":"tidur","小":"kecil","少":"sedikit","屋":"toko","山":"gunung","川":"sungai","布":"kain","帰":"pulang","常":"biasa","店":"toko","庭":"halaman","強":"kuat","待":"menunggu","心":"hati","忙":"sibuk","悲":"sedih","手":"tangan","掃":"menyapu","教":"mengajar","散":"berserak","料":"bahan","新":"baru","旅":"perjalanan","日":"hari","明":"terang","星":"bintang","映":"menayangkan","春":"musim semi","昨":"kemarin","時":"waktu","晩":"petang","晴":"cerah","暑":"panas","暗":"gelap","曇":"berawan","書":"menulis","月":"bulan","有":"ada","朝":"pagi","木":"pohon","本":"buku","机":"meja","東":"timur","果":"buah","校":"sekolah","椅":"kursi","楽":"senang","歌":"lagu","歩":"berjalan","母":"ibu","毎":"setiap","気":"semangat","水":"air","泳":"berenang","海":"laut","混":"bercampur","漢":"Tiongkok","父":"ayah","物":"benda","犬":"anjing","猫":"kucing","理":"aturan","生":"hidup","用":"keperluan","男":"laki-laki","町":"kota kecil","画":"gambar","病":"sakit","白":"putih","目":"mata","真":"benar","社":"perusahaan","私":"saya","秋":"musim gugur","空":"langit","窓":"jendela","符":"tanda","箱":"kotak","紙":"kertas","美":"indah","習":"berlatih","耳":"telinga","聞":"mendengar","肉":"daging","色":"warna","花":"bunga","英":"Inggris","茶":"teh","菜":"sayur","葉":"daun","行":"pergi","見":"melihat","親":"akrab","言":"berkata","話":"bicara","誌":"catatan","語":"bahasa","読":"membaca","財":"harta","買":"membeli","質":"mutu","赤":"merah","走":"berlari","起":"bangun","足":"kaki","車":"mobil","近":"dekat","速":"cepat","遅":"lambat","運":"membawa","道":"jalan","達":"jamak","遠":"jauh","部":"bagian","都":"ibu kota","野":"ladang","長":"panjang","閉":"menutup","開":"membuka","間":"antara","阪":"lereng","院":"institusi","除":"menyingkirkan","雑":"beragam","難":"sulit","雨":"hujan","雪":"salju","電":"listrik","青":"biru","静":"tenang","面":"wajah","音":"bunyi","顔":"wajah","食":"makan","飯":"nasi","飲":"minum","館":"gedung","駅":"stasiun","高":"tinggi","魚":"ikan","鳥":"burung","黒":"hitam"};
+const KM={"世":"dunia","丼":"mangkuk","亀":"kura-kura","争":"bertengkar","件":"perkara","伎":"seni","住":"tinggal","保":"menjaga","修":"memperbaiki","俳":"haiku","倉":"gudang","健":"sehat","備":"persiapan","僚":"rekan","充":"mengisi","光":"cahaya","免":"bebas","兎":"kelinci","全":"seluruh","内":"dalam","分":"bagian","初":"awal","到":"tiba","制":"aturan","刻":"mengukir","剣":"pedang","剤":"zat","務":"tugas","勤":"bekerja","匂":"bau","化":"berubah","北":"utara","午":"tengah hari","半":"setengah","南":"selatan","危":"bahaya","去":"pergi","収":"mengumpulkan","句":"kalimat","史":"sejarah","右":"kanan","同":"sama","和":"harmoni","咳":"batuk","品":"barang","喫":"menyesap","在":"berada","堂":"aula","境":"batas","外":"luar","央":"pusat","契":"berjanji","害":"merugikan","宿":"menginap","察":"menyelidiki","射":"menembak","将":"akan","居":"tinggal","履":"memakai","工":"kerajinan","左":"kiri","差":"perbedaan","帯":"sabuk","平":"datar","年":"tahun","庫":"gudang","康":"tenteram","張":"membentang","往":"pergi","律":"aturan","後":"belakang","復":"kembali","忘":"lupa","急":"cepat","怪":"aneh","情":"perasaan","憩":"beristirahat","成":"menjadi","我":"aku","戦":"berperang","授":"memberi","接":"menyambung","携":"membawa","撲":"memukul","改":"memperbarui","政":"pemerintahan","故":"sebab","救":"menolong","文":"tulisan","方":"arah","族":"keluarga","最":"paling","未":"belum","札":"kartu","板":"papan","柔":"lembut","査":"memeriksa","案":"rencana","棋":"catur","椒":"merica","検":"memeriksa","横":"samping","歴":"riwayat","氷":"es","汁":"kuah","汚":"kotor","治":"menyembuhkan","泉":"mata air","法":"hukum","注":"menuang","洋":"samudra","津":"pelabuhan","活":"hidup","消":"menghapus","清":"bersih","済":"selesai","渋":"getir","温":"hangat","湯":"air panas","満":"penuh","滞":"menunda","漂":"hanyut","漫":"sembarang","漬":"merendam","潔":"murni","災":"bencana","点":"titik","烏":"gagak","然":"begitu","焼":"membakar","煙":"asap","熊":"beruang","熱":"panas","片":"sebelah","狐":"rubah","猿":"monyet","現":"tampak","環":"cincin","界":"batas","畳":"tatami","痛":"sakit","発":"berangkat","登":"mendaki","相":"saling","着":"memakai","祝":"merayakan","祭":"festival","禁":"melarang","科":"bidang","籍":"daftar","紅":"merah tua","絵":"lukisan","緑":"hijau","縦":"vertikal","績":"prestasi","羊":"domba","老":"tua","職":"jabatan","胡":"asing","舞":"menari","苦":"pahit","落":"jatuh","虎":"harimau","虫":"serangga","蚊":"nyamuk","蛇":"ular","蛙":"katak","蜂":"lebah","蝶":"kupu-kupu","蟹":"kepiting","衣":"pakaian","表":"permukaan","西":"barat","観":"mengamati","許":"mengizinkan","試":"mencoba","説":"menjelaskan","豚":"babi","象":"gajah","資":"modal","輩":"rekan","退":"mundur","過":"melewati","酒":"minuman keras","釣":"memancing","防":"mencegah","険":"curam","障":"menghalangi","雀":"burung pipit","震":"gemetar","非":"bukan","韓":"Korea","領":"wilayah","類":"jenis","馬":"kuda","騒":"ribut","鶏":"ayam","鹿":"rusa","齢":"usia","丁":"blok","両":"kedua","中":"tengah","乳":"susu","予":"sebelumnya","井":"sumur","交":"bersilang","付":"menempel","体":"tubuh","信":"percaya","刺":"menusuk","包":"membungkus","医":"pengobatan","卵":"telur","受":"menerima","台":"landasan","号":"nomor","司":"mengurus","呂":"bak","喉":"tenggorokan","噌":"miso","団":"kelompok","城":"kastel","場":"tempat","塩":"garam","壁":"dinding","声":"suara","夕":"petang","夢":"mimpi","婦":"istri","官":"pejabat","客":"tamu","室":"ruangan","容":"isi","密":"rapat","寺":"kuil","寿":"umur panjang","局":"kantor","島":"pulau","巾":"kain","市":"kota","帽":"topi","幹":"batang","床":"lantai","廊":"koridor","弁":"katup","弟":"adik lk.","当":"mengena","彼":"dia","恋":"cinta","意":"maksud","慣":"terbiasa","所":"tempat","扉":"pintu","指":"jari","昼":"siang","服":"pakaian","末":"ujung","束":"ikat","来":"datang","枕":"bantal","林":"hutan kecil","柑":"jeruk","桜":"sakura","森":"hutan","業":"pekerjaan","橋":"jembatan","機":"mesin","檎":"apel","歯":"gigi","残":"sisa","段":"tingkat","毛":"bulu","汗":"keringat","池":"kolam","油":"minyak","波":"ombak","洗":"mencuci","浴":"mandi","涙":"air mata","港":"pelabuhan","湖":"danau","濯":"membilas","火":"api","爪":"kuku","牛":"sapi","玄":"gelap","由":"sebab","番":"giliran","皿":"piring","眼":"mata","石":"batu","砂":"pasir","碗":"mangkuk","祖":"leluhur","神":"dewa","秘":"rahasia","竹":"bambu","筆":"kuas","答":"menjawab","箸":"sumpit","米":"beras","糖":"gula","約":"janji","経":"melewati","給":"memberi","線":"garis","者":"orang","肩":"bahu","背":"punggung","腐":"busuk","腕":"lengan","腹":"perut","膝":"lutut","自":"diri","舌":"lidah","草":"rumput","荷":"muatan","菓":"camilan","薬":"obat","虹":"pelangi","蜜":"madu","血":"darah","計":"mengukur","誕":"lahir","警":"waspada","議":"berunding","豆":"kacang","趣":"selera","身":"badan","転":"berputar","辞":"kata","週":"pekan","郵":"pos","醤":"kecap","金":"emas","鉄":"besi","鉛":"timah","銀":"perak","鍋":"panci","鍵":"kunci","鏡":"cermin","関":"hubungan","階":"lantai","隣":"tetangga","雲":"awan","雷":"petir","靴":"sepatu","鞄":"tas","頭":"kepala","題":"judul","風":"angin","飛":"terbang","餅":"kue beras","首":"leher","駐":"berhenti","験":"menguji","骨":"tulang","髪":"rambut","鹸":"sabun","麺":"mi","多":"banyak","丈":"kokoh","上":"atas","下":"bawah","乗":"naik","事":"urusan","京":"ibu kota","人":"orang","今":"sekarang","仕":"melayani","休":"istirahat","会":"bertemu","作":"membuat","使":"memakai","供":"menyertai","便":"praktis","傘":"payung","元":"asal","兄":"kakak lk.","先":"dulu","入":"masuk","公":"umum","写":"menyalin","冬":"musim dingin","出":"keluar","切":"memotong","利":"manfaat","前":"depan","力":"tenaga","勉":"berusaha","動":"bergerak","友":"teman","口":"mulut","古":"lama","合":"cocok","名":"nama","味":"rasa","員":"anggota","問":"pertanyaan","図":"gambar","国":"negara","園":"taman","地":"tanah","夏":"musim panas","夜":"malam","大":"besar","天":"langit","夫":"suami","女":"perempuan","好":"suka","姉":"kakak pr.","嬉":"gembira","子":"anak","字":"aksara","学":"belajar","安":"murah","家":"rumah","寒":"dingin","寝":"tidur","小":"kecil","少":"sedikit","屋":"toko","山":"gunung","川":"sungai","布":"kain","帰":"pulang","常":"biasa","店":"toko","庭":"halaman","強":"kuat","待":"menunggu","心":"hati","忙":"sibuk","悲":"sedih","手":"tangan","掃":"menyapu","教":"mengajar","散":"berserak","料":"bahan","新":"baru","旅":"perjalanan","日":"hari","明":"terang","星":"bintang","映":"menayangkan","春":"musim semi","昨":"kemarin","時":"waktu","晩":"petang","晴":"cerah","暑":"panas","暗":"gelap","曇":"berawan","書":"menulis","月":"bulan","有":"ada","朝":"pagi","木":"pohon","本":"buku","机":"meja","東":"timur","果":"buah","校":"sekolah","椅":"kursi","楽":"senang","歌":"lagu","歩":"berjalan","母":"ibu","毎":"setiap","気":"semangat","水":"air","泳":"berenang","海":"laut","混":"bercampur","漢":"Tiongkok","父":"ayah","物":"benda","犬":"anjing","猫":"kucing","理":"aturan","生":"hidup","用":"keperluan","男":"laki-laki","町":"kota kecil","画":"gambar","病":"sakit","白":"putih","目":"mata","真":"benar","社":"perusahaan","私":"saya","秋":"musim gugur","空":"langit","窓":"jendela","符":"tanda","箱":"kotak","紙":"kertas","美":"indah","習":"berlatih","耳":"telinga","聞":"mendengar","肉":"daging","色":"warna","花":"bunga","英":"Inggris","茶":"teh","菜":"sayur","葉":"daun","行":"pergi","見":"melihat","親":"akrab","言":"berkata","話":"bicara","誌":"catatan","語":"bahasa","読":"membaca","財":"harta","買":"membeli","質":"mutu","赤":"merah","走":"berlari","起":"bangun","足":"kaki","車":"mobil","近":"dekat","速":"cepat","遅":"lambat","運":"membawa","道":"jalan","達":"jamak","遠":"jauh","部":"bagian","都":"ibu kota","野":"ladang","長":"panjang","閉":"menutup","開":"membuka","間":"antara","阪":"lereng","院":"institusi","除":"menyingkirkan","雑":"beragam","難":"sulit","雨":"hujan","雪":"salju","電":"listrik","青":"biru","静":"tenang","面":"wajah","音":"bunyi","顔":"wajah","食":"makan","飯":"nasi","飲":"minum","館":"gedung","駅":"stasiun","高":"tinggi","魚":"ikan","鳥":"burung","黒":"hitam"};
 function renderTokens(tk,hint){
   return tk.map(o=>{
     let inner=esc(o.t);
@@ -1341,6 +1682,8 @@ function drawQuestion(){
 }
 function nextQuestion(){
   stopMic();
+  clearTimeout(S.failT);document.querySelectorAll('.failov').forEach(x=>x.remove());
+  S.tries=0;$('.qcard').classList.remove('wrong','shake');
   if(S.weak&&!weakList().length){showDone('weak');return}
   if(S.rev&&!missN()){showDone('rev');return}
   S.q=makeQ(S.mode,S.len,S.lastKey);S.lastKey=S.q.key;
@@ -1435,8 +1778,23 @@ const FX=(()=>{
     }
   };
 })();
+function wrongAttempt(said){
+  if(S.answered)return;
+  S.tries=(S.tries||0)+1;
+  const c=$('.qcard');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake','wrong');
+  if(S.tries<4){el.micStatus.textContent='Salah '+S.tries+'/4. Coba lagi.';el.ans.select();return}
+  S.answered=true;S.counted=true;S.prevStreak=S.sess.streak;S.said=said;S.resultOk=false;
+  S.sess.t++;store.t++;S.sess.streak=0;recMiss(false);save();updateScore();
+  FX.lose();
+  const ov=document.createElement('div');ov.className='failov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(255,106,0,.4);z-index:98;pointer-events:none;display:flex;align-items:center;justify-content:center;text-align:center';
+  ov.innerHTML=`<div style="background:rgba(0,0,0,.5);color:#fff;border-radius:14px;padding:14px 22px"><div style="font-size:14px">Jawaban yang benar</div><div style="font-size:28px;font-weight:800">${esc(S.q.romText)}</div></div>`;
+  document.body.appendChild(ov);
+  S.failT=setTimeout(nextQuestion,2400);
+}
 function finish(ok,said){
   if(S.answered)return;
+  if(ok===true){$('.qcard').classList.remove('wrong','shake');el.micStatus.textContent=''}
   S.answered=true;S.counted=true;S.prevStreak=S.sess.streak;S.said=said;S.resultOk=ok;
   S.sess.t++;store.t++;
   if(ok){S.sess.c++;store.c++;S.sess.streak++;store.b=Math.max(store.b,S.sess.streak)}else S.sess.streak=0;
@@ -1503,7 +1861,7 @@ function toggleMic(){
     if(r.isFinal){
       const alts=[...r].map(a=>a.transcript);
       listening=false;el.mic.classList.remove('on');
-      finish(alts.some(a=>speechMatches(S.q,a)),`🎙️ ${alts[0]}`);
+      if(alts.some(a=>speechMatches(S.q,a)))finish(true,`🎙️ ${alts[0]}`);else wrongAttempt(`🎙️ ${alts[0]}`);
     }else el.micStatus.textContent='… '+r[0].transcript;
   };
   rec.onerror=e=>{
@@ -1533,9 +1891,10 @@ function doCheck(e){
     if(S.answered||!S.q)return;
     const v=el.ans.value.trim();
     if(!v){el.micStatus.textContent='Ketik bacaannya dulu, lalu tekan Cek.';el.ans.focus();return}
-    finish(typedMatches(S.q,v),v);
+    if(typedMatches(S.q,v))finish(true,v);else wrongAttempt(v);
   }catch(err){el.micStatus.textContent='Terjadi galat: '+err.message;console.error(err)}
 }
+el.ans.addEventListener('input',()=>$('.qcard').classList.remove('wrong'));
 el.form.addEventListener('submit',doCheck);
 $('#checkBtn').addEventListener('click',doCheck);   // cadangan bila submit form dicegat oleh skrip/gaya lain di halaman
 el.mic.addEventListener('click',toggleMic);
