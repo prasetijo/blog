@@ -57,6 +57,9 @@ h1{font-size:24px;font-weight:700;margin:0;line-height:1.2}
 .pill{background:var(--accent);color:var(--accent-ink);border-radius:999px;padding:4px 12px;font-size:13px;font-weight:700}
 .score{margin-left:auto;font-size:14px;font-weight:700;color:var(--muted);white-space:nowrap}
 
+.qcard.wrong{background:#ffb066;border-color:#ffb066;box-shadow:none}
+.qcard.shake{animation:shk .5s}
+@keyframes shk{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(6px)}30%,50%,70%{transform:translateX(-10px)}40%,60%{transform:translateX(10px)}}
 .qcard{margin-top:14px;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:36px 16px;
   text-align:center;box-shadow:var(--shadow);min-height:190px;display:flex;align-items:center;justify-content:center}
 .qtext{font-family:"Noto Sans JP","Hiragino Sans","Yu Gothic",sans-serif;
@@ -1679,6 +1682,8 @@ function drawQuestion(){
 }
 function nextQuestion(){
   stopMic();
+  clearTimeout(S.failT);document.querySelectorAll('.failov').forEach(x=>x.remove());
+  S.tries=0;$('.qcard').classList.remove('wrong','shake');
   if(S.weak&&!weakList().length){showDone('weak');return}
   if(S.rev&&!missN()){showDone('rev');return}
   S.q=makeQ(S.mode,S.len,S.lastKey);S.lastKey=S.q.key;
@@ -1773,8 +1778,23 @@ const FX=(()=>{
     }
   };
 })();
+function wrongAttempt(said){
+  if(S.answered)return;
+  S.tries=(S.tries||0)+1;
+  const c=$('.qcard');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake','wrong');
+  if(S.tries<4){el.micStatus.textContent='Salah '+S.tries+'/4. Coba lagi.';el.ans.select();return}
+  S.answered=true;S.counted=true;S.prevStreak=S.sess.streak;S.said=said;S.resultOk=false;
+  S.sess.t++;store.t++;S.sess.streak=0;recMiss(false);save();updateScore();
+  FX.lose();
+  const ov=document.createElement('div');ov.className='failov';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(255,106,0,.4);z-index:98;pointer-events:none;display:flex;align-items:center;justify-content:center;text-align:center';
+  ov.innerHTML=`<div style="background:rgba(0,0,0,.5);color:#fff;border-radius:14px;padding:14px 22px"><div style="font-size:14px">Jawaban yang benar</div><div style="font-size:28px;font-weight:800">${esc(S.q.romText)}</div></div>`;
+  document.body.appendChild(ov);
+  S.failT=setTimeout(nextQuestion,2400);
+}
 function finish(ok,said){
   if(S.answered)return;
+  if(ok===true){$('.qcard').classList.remove('wrong','shake');el.micStatus.textContent=''}
   S.answered=true;S.counted=true;S.prevStreak=S.sess.streak;S.said=said;S.resultOk=ok;
   S.sess.t++;store.t++;
   if(ok){S.sess.c++;store.c++;S.sess.streak++;store.b=Math.max(store.b,S.sess.streak)}else S.sess.streak=0;
@@ -1841,7 +1861,7 @@ function toggleMic(){
     if(r.isFinal){
       const alts=[...r].map(a=>a.transcript);
       listening=false;el.mic.classList.remove('on');
-      finish(alts.some(a=>speechMatches(S.q,a)),`🎙️ ${alts[0]}`);
+      if(alts.some(a=>speechMatches(S.q,a)))finish(true,`🎙️ ${alts[0]}`);else wrongAttempt(`🎙️ ${alts[0]}`);
     }else el.micStatus.textContent='… '+r[0].transcript;
   };
   rec.onerror=e=>{
@@ -1871,9 +1891,10 @@ function doCheck(e){
     if(S.answered||!S.q)return;
     const v=el.ans.value.trim();
     if(!v){el.micStatus.textContent='Ketik bacaannya dulu, lalu tekan Cek.';el.ans.focus();return}
-    finish(typedMatches(S.q,v),v);
+    if(typedMatches(S.q,v))finish(true,v);else wrongAttempt(v);
   }catch(err){el.micStatus.textContent='Terjadi galat: '+err.message;console.error(err)}
 }
+el.ans.addEventListener('input',()=>$('.qcard').classList.remove('wrong'));
 el.form.addEventListener('submit',doCheck);
 $('#checkBtn').addEventListener('click',doCheck);   // cadangan bila submit form dicegat oleh skrip/gaya lain di halaman
 el.mic.addEventListener('click',toggleMic);
