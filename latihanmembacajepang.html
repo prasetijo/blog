@@ -1716,7 +1716,7 @@ function goHome(){
 
 /* ---------- hasil ---------- */
 const VID=document.createElement('video');
-VID.src='blog/assets/lv_0_20261014191711.mp4';VID.preload='auto';VID.playsInline=true;VID.setAttribute('playsinline','');
+VID.src='assets/lv_0_20261014191711.mp4';VID.preload='auto';VID.playsInline=true;VID.setAttribute('playsinline','');
 VID.style.cssText='position:fixed;left:50%;bottom:0;width:min(100vw,720px);height:min(52vh,405px);object-fit:cover;background:#000;border-radius:16px 16px 0 0;transform:translate(-50%,105%);transition:transform .35s ease-out;z-index:99;pointer-events:none';
 VID.onended=()=>{VID.style.transform='translate(-50%,105%)'};
 document.body.appendChild(VID);
