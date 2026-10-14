@@ -1715,11 +1715,17 @@ function goHome(){
 }
 
 /* ---------- hasil ---------- */
-const VID=document.createElement('video');
-VID.src='assets/lv_0_20261014191711.mp4';VID.preload='auto';VID.playsInline=true;VID.setAttribute('playsinline','');
-VID.style.cssText='position:fixed;left:50%;bottom:0;width:min(100vw,720px);height:min(52vh,405px);object-fit:cover;background:#000;border-radius:16px 16px 0 0;transform:translate(-50%,105%);transition:transform .35s ease-out;z-index:99;pointer-events:none';
-VID.onended=()=>{VID.style.transform='translate(-50%,105%)'};
+const BASES=['assets/','','../assets/','/assets/'],GIF='andi_transparent.gif',SND='lv_0_20261014191711.mp3';
+let gi=0,si=0,VT=0,GBASE=BASES[0]+GIF;
+const VID=document.createElement('img');
+VID.alt='';
+VID.style.cssText='position:fixed;left:50%;bottom:0;width:min(100vw,560px);max-height:62vh;object-fit:contain;transform:translate(-50%,105%);transition:transform .35s ease-out;z-index:99;pointer-events:none';
+VID.onerror=()=>{if(gi<BASES.length-1){gi++;GBASE=BASES[gi]+GIF;VID.src=GBASE}else console.warn('GIF tidak ditemukan di:',BASES.map(x=>x+GIF))};
+VID.src=GBASE;
 document.body.appendChild(VID);
+const SNDEL=new Audio();SNDEL.preload='auto';
+SNDEL.onerror=()=>{if(si<BASES.length-1){si++;SNDEL.src=BASES[si]+SND}else console.warn('MP3 tidak ditemukan di:',BASES.map(x=>x+SND))};
+SNDEL.src=BASES[0]+SND;
 const FX=(()=>{
   const cv=document.createElement('canvas');
   cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:99';
@@ -1778,10 +1784,10 @@ const FX=(()=>{
       go();
     },
     lose(){
-      VID.currentTime=0;VID.muted=false;
+      VID.src=GBASE+'#'+Date.now();
       VID.style.transform='translate(-50%,0)';
-      const pr=VID.play();
-      if(pr)pr.catch(()=>{VID.muted=true;VID.play().catch(()=>{})});
+      SNDEL.currentTime=0;const pr=SNDEL.play();if(pr)pr.catch(()=>{});
+      clearTimeout(VT);VT=setTimeout(()=>{VID.style.transform='translate(-50%,105%)'},2400);
     }
   };
 })();
