@@ -151,6 +151,7 @@ h1{font-size:24px;font-weight:700;margin:0;line-height:1.2}
 
     <div id="extra"></div>
     <p class="foot" id="stat"></p>
+    <div id="progress"></div>
   </section>
 
   <!-- ================= HALAMAN SOAL ================= -->
@@ -1954,10 +1955,10 @@ function typoDiff(q,said){
 }
 const S={mean:false,mode:null,len:'word',q:null,answered:false,hint:false,sess:{c:0,t:0,streak:0},
          prevStreak:0,counted:false,resultOk:null,said:'',lastKey:''};
-let store={c:0,t:0,b:0,miss:{},ch:{},sr:{}};
+let store={c:0,t:0,b:0,miss:{},ch:{},sr:{},hist:{}};
 try{const x=JSON.parse(localStorage.getItem('yomu.v1')||'null');if(x)store=Object.assign(store,x)}catch(e){}
-store.miss=store.miss||{};store.ch=store.ch||{};store.sr=store.sr||{};
-const save=()=>{try{localStorage.setItem('yomu.v1',JSON.stringify(store))}catch(e){}};
+store.miss=store.miss||{};store.ch=store.ch||{};store.sr=store.sr||{};store.hist=store.hist||{};
+const save=()=>{try{snap()}catch(e){}try{localStorage.setItem('yomu.v1',JSON.stringify(store))}catch(e){}};
 
 const el={
   home:$('#home'),quiz:$('#quiz'),stat:$('#stat'),modePill:$('#modePill'),score:$('#score'),
@@ -1977,13 +1978,38 @@ function renderExtra(){
   $('#revBtn').onclick=()=>startQuiz('rev');
   $$('#extra .chips button').forEach(b=>b.onclick=()=>startQuiz('pat',b.dataset.pat));
 }
+function snap(){
+  const d=DAY(),h=store.hist||(store.hist={});
+  h[d]={h:srHafal(),l:Object.keys(store.sr).length,m:masteredN()};
+  const ks=Object.keys(h).map(Number).sort((a,b)=>a-b);
+  while(ks.length>60)delete h[ks.shift()];
+}
+function renderProgress(){
+  const ks=Object.keys(store.hist).map(Number).sort((a,b)=>a-b).slice(-14);
+  if(!ks.length)return;
+  const W=320,H=175,L=30,R=14,T=12,B=26,pw=W-L-R,ph=H-T-B,hs=store.hist;
+  const se=[['h','Hafal permanen','var(--accent)'],['l','Sedang dipelajari','#8a8f98'],['m','Hafal di kuis','#3a7bd5']];
+  const ymax=Math.ceil(Math.max(10,...ks.flatMap(k=>se.map(x=>hs[k][x[0]])))/10)*10;
+  const x=i=>L+(ks.length>1?pw*i/(ks.length-1):pw/2),y=v=>T+ph-ph*v/ymax;
+  let g='';
+  for(let i=0;i<=4;i++){const v=ymax*i/4;g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)" stroke-width="1"/><text x="${L-5}" y="${y(v)+3}" font-size="9" text-anchor="end" style="fill:var(--muted)">${Math.round(v)}</text>`}
+  const dl=k=>{const d=new Date(k*864e5);return d.getUTCDate()+'/'+(d.getUTCMonth()+1)};
+  ks.forEach((k,i)=>{if(i===0||i===ks.length-1||ks.length<=7)g+=`<text x="${x(i)}" y="${H-8}" font-size="9" text-anchor="middle" style="fill:var(--muted)">${dl(k)}</text>`});
+  se.forEach(([f,n,c])=>{
+    g+=`<polyline points="${ks.map((k,i)=>x(i)+','+y(hs[k][f])).join(' ')}" fill="none" style="stroke:${c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
+    ks.forEach((k,i)=>g+=`<circle cx="${x(i)}" cy="${y(hs[k][f])}" r="3" style="fill:${c}"/>`);
+  });
+  const last=hs[ks[ks.length-1]];
+  const leg=se.map(([f,n,c])=>`<span style="display:inline-flex;align-items:center;gap:5px;margin-right:12px"><i style="width:10px;height:10px;border-radius:50%;background:${c};display:inline-block"></i>${n}: <b>${last[f]}</b></span>`).join('');
+  $('#progress').innerHTML=`<div class="hf"><h2 class="lbl">Grafik perkembangan hafalan</h2><svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Grafik perkembangan hafalan huruf">${g}</svg><div class="hs" style="line-height:1.9">${leg}</div><div class="hs">Menampilkan hingga 14 hari terakhir. Satu titik dicatat untuk setiap hari kamu berlatih.</div></div>`;
+}
 function renderStat(){
-  renderExtra();
+  snap();renderExtra();renderProgress();
   el.stat.innerHTML=store.t
     ?`Total benar: <b>${store.c}</b> dari ${store.t} · Rekor beruntun: <b>${store.b}</b> 🔥 · <button id="reset" type="button">reset</button>`
     :'Jawab dengan romaji (Hepburn atau Kunrei, keduanya boleh) atau dengan suara.';
   const r=$('#reset');
-  if(r)r.onclick=()=>{if(confirm('Hapus semua statistik?')){store={c:0,t:0,b:0,miss:{},ch:{},sr:{}};save();renderStat()}};
+  if(r)r.onclick=()=>{if(confirm('Hapus semua statistik?')){store={c:0,t:0,b:0,miss:{},ch:{},sr:{},hist:{}};save();renderStat()}};
 }
 function setLen(len){
   S.len=len;
@@ -2271,23 +2297,4 @@ $('#ans2').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault()
 $('#mchk').checked=!!store.mchk;
 $('#mchk').addEventListener('change',()=>{store.mchk=$('#mchk').checked;save();updMean()});
 el.form.addEventListener('submit',doCheck);
-$('#checkBtn').addEventListener('click',doCheck);   // cadangan bila submit form dicegat oleh skrip/gaya lain di halaman
-el.mic.addEventListener('click',toggleMic);
-el.skip.addEventListener('click',()=>{
-  if(S.answered)return;
-  S.answered=true;S.counted=false;S.resultOk=null;S.said='';S.sess.streak=0;
-  recMiss(null);save();showResult();updateScore();
-});
-el.next.addEventListener('click',nextQuestion);
-document.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&!e.isComposing&&S.answered&&!el.quiz.hidden&&document.activeElement!==$('#override')&&document.activeElement!==$('#speak')){
-    e.preventDefault();nextQuestion();
-  }
-});
-
-setLen('word');renderStat();
-window.__yomu={makeQ,typedMatches,speechMatches,canon,kanaToRomaji,N,V,A,NA};
-})();
-</script>
-</body>
-</html>
+$('#checkBtn').addEventListener('click',doCheck);   // cadangan bila submit form dicegat oleh skrip/gaya lain d
