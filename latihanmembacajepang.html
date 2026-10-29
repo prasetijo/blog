@@ -84,6 +84,9 @@ h1{font-size:24px;font-weight:700;margin:0;line-height:1.2}
 .revbtn:disabled{opacity:.5}
 .ill{display:flex;align-items:center;justify-content:center;gap:14px;margin:14px 0 4px}
 .ill .g{font-size:96px;line-height:1.15}.ill .eq{font-size:28px;color:var(--muted)}
+.chc{border:1px solid var(--line);border-radius:14px;padding:12px;margin:12px 0;background:var(--surface)}
+.chh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:6px;font-size:14px}.chh span{font-size:12px;color:var(--muted)}
+.chd{margin-top:8px;font-size:13px}.cc{display:inline-block;border:1px solid;border-radius:8px;padding:2px 8px;margin:4px 4px 0 0;font-size:15px;background:var(--surface)}
 .sp{display:inline-block;width:.55em}
 
 .tools{display:flex;gap:8px;margin:12px 0}
@@ -1759,6 +1762,7 @@ function learn(mode){
   }
   function next(){L.fb=null;L.i++;if(L.i>=L.q.length){if(L.ph==='mc'){L.ph='type';L.q=sh(chars);L.i=0}else L.ph='done'}R()}
   function answer(c,ok,given){
+    logEv(c,ok);
     if(!ok){L.res[c]=false;L.q.push(c)}
     L.fb={ok,given};R();
   }
@@ -1924,7 +1928,8 @@ function updChars(ok){
   const cs=S.q.target?[S.q.target]:qChars(S.q),det=ok===true?null:unitDiff(S.q,S.said),inc=det?1:Math.min(1,3/(cs.length||1));
   cs.forEach(c=>{
     const r=store.ch[c]||(store.ch[c]={s:0,w:0});
-    if(ok===true||(det&&!det.bad.has(c))){r.s++;if(r.s===3){r.w=0;S.newM.push(c)}else if(r.s>3)r.w=0}
+    const good=ok===true||(det&&!det.bad.has(c));logEv(c,good);
+    if(good){r.s++;if(r.s===3){r.w=0;S.newM.push(c)}else if(r.s>3)r.w=0}
     else{r.s=0;r.w=Math.min(6,r.w+inc)}
   });
 }
@@ -1957,9 +1962,9 @@ function typoDiff(q,said){
 }
 const S={mean:false,mode:null,len:'word',q:null,answered:false,hint:false,sess:{c:0,t:0,streak:0},
          prevStreak:0,counted:false,resultOk:null,said:'',lastKey:''};
-let store={c:0,t:0,b:0,miss:{},ch:{},sr:{},hist:{}};
+let store={c:0,t:0,b:0,miss:{},ch:{},sr:{},hist:{},log:{h:[],k:[],j:[]}};
 try{const x=JSON.parse(localStorage.getItem('yomu.v1')||'null');if(x)store=Object.assign(store,x)}catch(e){}
-store.miss=store.miss||{};store.ch=store.ch||{};store.sr=store.sr||{};store.hist=store.hist||{};
+store.miss=store.miss||{};store.ch=store.ch||{};store.sr=store.sr||{};store.hist=store.hist||{};store.log=store.log||{};['h','k','j'].forEach(k=>{if(!Array.isArray(store.log[k]))store.log[k]=[]});
 for(const k of Object.keys(store.miss)){const m=store.miss[k];if(!m||!Array.isArray(m.tk))delete store.miss[k]}
 for(const k of Object.keys(store.ch)){const r=store.ch[k];if(!r||typeof r.s!=='number'||typeof r.w!=='number')delete store.ch[k]}
 for(const k of Object.keys(store.sr)){const r=store.sr[k];if(!r||typeof r.b!=='number'||typeof r.due!=='number')delete store.sr[k]}
@@ -1990,24 +1995,45 @@ function snap(){
   const ks=Object.keys(h).map(Number).sort((a,b)=>a-b);
   while(ks.length>60)delete h[ks.shift()];
 }
-function renderProgress(){
-  const ks=Object.keys(store.hist).map(Number).sort((a,b)=>a-b).slice(-14);
-  if(!ks.length)return;
-  const W=320,H=175,L=30,R=14,T=12,B=26,pw=W-L-R,ph=H-T-B,hs=store.hist;
-  const se=[['h','Hafal permanen','var(--accent)'],['l','Sedang dipelajari','#8a8f98'],['m','Hafal di kuis','#3a7bd5']];
-  const ymax=Math.ceil(Math.max(8,...ks.flatMap(k=>se.map(x=>hs[k][x[0]])))/4)*4;
-  const x=i=>L+(ks.length>1?pw*i/(ks.length-1):pw/2),y=v=>T+ph-ph*v/ymax;
+function logEv(c,ok){
+  const k=/^[\u3041-\u3096]/.test(c)?'h':/^[\u30a1-\u30fa]/.test(c)?'k':/^[\u3400-\u9fff]/.test(c)?'j':null;
+  if(!k)return;
+  const a=store.log[k];a.push([c,ok?1:0]);if(a.length>400)a.splice(0,a.length-400);
+}
+const CH={h:{n:'Hiragana',c:'#2e9e5b',sel:null,open:false},k:{n:'Katakana',c:'#3a7bd5',sel:null,open:false},j:{n:'Kanji',c:'#e8730c',sel:null,open:false}};
+function chartHTML(key){
+  const m=CH[key],ev=store.log[key].slice(-200),n=ev.length;
+  if(n<2)return`<div class="chc"><div class="chh"><b style="color:${m.c}">${m.n}</b><span>belum ada data</span></div><div class="hs">Jawab beberapa soal ${m.n.toLowerCase()} untuk melihat grafiknya.</div></div>`;
+  let sc=0,p=0;const raw=ev.map(e=>sc+=e[1]?1:-1),sm=raw.map((v,i)=>p=i?p*.6+v*.4:v);
+  const W=320,H=150,L=30,R=12,T=10,B=20,pw=W-L-R,ph=H-T-B;
+  let lo=Math.min(0,...raw),hi=Math.max(1,...raw);if(hi-lo<4)hi=lo+4;
+  const x=i=>L+pw*i/(n-1),y=v=>T+ph-ph*(v-lo)/(hi-lo);
   let g='';
-  for(let i=0;i<=4;i++){const v=ymax*i/4;g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)" stroke-width="1"/><text x="${L-5}" y="${y(v)+3}" font-size="9" text-anchor="end" style="fill:var(--muted)">${Math.round(v)}</text>`}
-  const dl=k=>{const d=new Date(k*864e5);return d.getUTCDate()+'/'+(d.getUTCMonth()+1)};
-  ks.forEach((k,i)=>{if(i===0||i===ks.length-1||ks.length<=7)g+=`<text x="${x(i)}" y="${H-8}" font-size="9" text-anchor="middle" style="fill:var(--muted)">${dl(k)}</text>`});
-  se.forEach(([f,n,c])=>{
-    g+=`<polyline points="${ks.map((k,i)=>x(i)+','+y(hs[k][f])).join(' ')}" fill="none" style="stroke:${c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`;
-    ks.forEach((k,i)=>g+=`<circle cx="${x(i)}" cy="${y(hs[k][f])}" r="3" style="fill:${c}"/>`);
+  for(let i=0;i<=4;i++){const v=lo+(hi-lo)*i/4;g+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" style="stroke:var(--line)" stroke-width="1"/><text x="${L-4}" y="${y(v)+3}" font-size="9" text-anchor="end" style="fill:var(--muted)">${Math.round(v)}</text>`}
+  if(lo<0)g+=`<line x1="${L}" x2="${W-R}" y1="${y(0)}" y2="${y(0)}" style="stroke:var(--muted)" stroke-width="1" stroke-dasharray="3 3"/>`;
+  g+=`<text x="${L}" y="${H-5}" font-size="9" style="fill:var(--muted)">1</text><text x="${W-R}" y="${H-5}" font-size="9" text-anchor="end" style="fill:var(--muted)">jawaban ke-${n}</text>`;
+  g+=`<polyline points="${raw.map((v,i)=>x(i)+','+y(v)).join(' ')}" fill="none" style="stroke:${m.c}" stroke-opacity=".28" stroke-width="1.5"/>`;
+  g+=`<polygon points="${L},${y(lo)} ${sm.map((v,i)=>x(i)+','+y(v)).join(' ')} ${x(n-1)},${y(lo)}" style="fill:${m.c}" fill-opacity=".08"/>`;
+  g+=`<polyline points="${sm.map((v,i)=>x(i)+','+y(v)).join(' ')}" fill="none" style="stroke:${m.c}" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>`;
+  g+=`<circle cx="${x(n-1)}" cy="${y(sm[n-1])}" r="3.5" style="fill:${m.c}"/>`;
+  let tip='Ketuk grafik untuk melihat huruf yang naik dan turun.';
+  if(m.sel!=null&&m.sel<n){const i=m.sel,e=ev[i];g+=`<line x1="${x(i)}" x2="${x(i)}" y1="${T}" y2="${T+ph}" style="stroke:var(--ink)" stroke-width="1" stroke-dasharray="2 2"/><circle cx="${x(i)}" cy="${y(raw[i])}" r="4" style="fill:${e[1]?'#2e9e5b':'#d33'};stroke:#fff" stroke-width="1.5"/>`;tip=`Jawaban ke-${i+1}: <b>${esc(e[0])}</b> ${e[1]?'benar (naik)':'salah (turun)'} &middot; skor ${raw[i]}`}
+  let det='';
+  if(m.open){
+    const agg={};ev.forEach(e=>{const a=agg[e[0]]||(agg[e[0]]={u:0,d:0});e[1]?a.u++:a.d++});
+    const up=Object.entries(agg).filter(([c,a])=>a.u>a.d).sort((a,b)=>(b[1].u-b[1].d)-(a[1].u-a[1].d)).slice(0,30),dn=Object.entries(agg).filter(([c,a])=>a.d>a.u).sort((a,b)=>(b[1].d-b[1].u)-(a[1].d-a[1].u)).slice(0,30);
+    const chips=(l,col,sg)=>l.length?l.map(([c,a])=>`<span class="cc" style="border-color:${col};color:${col}">${esc(c)} ${sg}${Math.abs(a.u-a.d)}</span>`).join(''):'<span class="hs">-</span>';
+    det=`<div class="chd"><div><b style="color:#2e9e5b">Naik</b> (lebih sering benar)</div>${chips(up,'#2e9e5b','+')}<div style="margin-top:8px"><b style="color:#d33">Turun</b> (lebih sering salah)</div>${chips(dn,'#d33','−')}<div class="hs" style="margin-top:8px">Dihitung dari ${n} jawaban terakhir. <a href="#" data-close="${key}">Tutup</a></div></div>`;
+  }
+  return`<div class="chc"><div class="chh"><b style="color:${m.c}">${m.n}</b><span>skor ${raw[n-1]} &middot; benar ${ev.filter(e=>e[1]).length} / salah ${ev.filter(e=>!e[1]).length}</span></div><svg data-k="${key}" viewBox="0 0 ${W} ${H}" width="100%" style="cursor:pointer;touch-action:manipulation" role="img" aria-label="Grafik ${m.n}">${g}</svg><div class="hs" style="min-height:18px">${tip}</div>${det}</div>`;
+}
+function renderProgress(){
+  $('#progress').innerHTML=`<div class="hf"><h2 class="lbl">Grafik perkembangan hafalan</h2><div class="hs">Setiap jawaban benar menaikkan skor (+1), setiap salah menurunkannya (−1). Garis tebal adalah hasil penghalusan, garis tipis adalah data asli.</div>${['h','k','j'].map(chartHTML).join('')}</div>`;
+  $$('#progress svg[data-k]').forEach(sv=>sv.onclick=e=>{
+    const k=sv.dataset.k,r=sv.getBoundingClientRect(),n=Math.min(store.log[k].length,200),fx=(e.clientX-r.left)/r.width*320;
+    CH[k].sel=Math.max(0,Math.min(n-1,Math.round((fx-30)/278*(n-1))));CH[k].open=true;renderProgress();
   });
-  const last=hs[ks[ks.length-1]];
-  const leg=se.map(([f,n,c])=>`<span style="display:inline-flex;align-items:center;gap:5px;margin-right:12px"><i style="width:10px;height:10px;border-radius:50%;background:${c};display:inline-block"></i>${n}: <b>${last[f]}</b></span>`).join('');
-  $('#progress').innerHTML=`<div class="hf"><h2 class="lbl">Grafik perkembangan hafalan</h2><svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Grafik perkembangan hafalan huruf">${g}</svg><div class="hs" style="line-height:1.9">${leg}</div><div class="hs">Menampilkan hingga 14 hari terakhir. Satu titik dicatat untuk setiap hari kamu berlatih.</div></div>`;
+  $$('#progress [data-close]').forEach(a=>a.onclick=e=>{e.preventDefault();CH[a.dataset.close].open=false;renderProgress()});
 }
 function renderStat(){
   snap();renderExtra();renderProgress();
@@ -2015,7 +2041,7 @@ function renderStat(){
     ?`Total benar: <b>${store.c}</b> dari ${store.t} · Rekor beruntun: <b>${store.b}</b> 🔥 · <button id="reset" type="button">reset</button>`
     :'Jawab dengan romaji (Hepburn atau Kunrei, keduanya boleh) atau dengan suara.';
   const r=$('#reset');
-  if(r)r.onclick=()=>{if(confirm('Hapus semua statistik?')){store={c:0,t:0,b:0,miss:{},ch:{},sr:{},hist:{}};save();renderStat()}};
+  if(r)r.onclick=()=>{if(confirm('Hapus semua statistik?')){store={c:0,t:0,b:0,miss:{},ch:{},sr:{},hist:{},log:{h:[],k:[],j:[]}};save();renderStat()}};
 }
 function setLen(len){
   S.len=len;
@@ -2083,7 +2109,7 @@ function goHome(){
 }
 
 /* ---------- hasil ---------- */
-const BASES=['assets/','','../assets/','/assets/'],GIF='andi_transparent.gif',SND='lv_0_20261014191711.mp3';
+const BASES=['blog/','','../blog/','/blog/'],GIF='andi_transparent.gif',SND='lv_0_20261014191711.mp3';
 let gi=0,si=0,VT=0,GBASE=BASES[0]+GIF;
 const VID=document.createElement('img');
 VID.alt='';
