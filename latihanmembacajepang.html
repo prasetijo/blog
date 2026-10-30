@@ -156,7 +156,8 @@ h1{font-size:24px;font-weight:700;margin:0;line-height:1.2}
     <div id="extra"></div>
     <p class="foot" id="stat"></p>
     <div id="progress"></div>
-    <p class="foot" style="text-align:center">Versi 29 Okt 2026</p>
+    <p class="foot" style="text-align:center">Versi 30 Okt 2026</p>
+    <label class="mchk" style="justify-content:center"><input type="checkbox" id="beepChk"> Bunyi saat menyentuh tombol</label>
   </section>
 
   <!-- ================= HALAMAN SOAL ================= -->
@@ -2109,7 +2110,13 @@ function goHome(){
 }
 
 /* ---------- hasil ---------- */
-const BASES=['assets/','','../assets/','/assets/'],GIF='andi_transparent.gif',SND='lv_0_20261014191711.mp3';
+let lastB=0;
+function beep(){
+  if(store.beep===false)return;
+  const t=performance.now();if(t-lastB<30)return;lastB=t;
+  tapSound();
+}
+const BASES=['blog/','','../blog/','/blog/'],GIF='andi_transparent.gif',SND='lv_0_20261014191711.mp3';
 let gi=0,si=0,VT=0,GBASE=BASES[0]+GIF;
 const VID=document.createElement('img');
 VID.alt='';
@@ -2204,11 +2211,12 @@ function meanMatches(q,m){
 }
 const useMean=()=>$('#mchk').checked&&S.q&&S.q.len==='word'&&!S.q.target;
 function updMean(){const on=$('#mchk').checked,ok=useMean();$('#meanRow').hidden=!ok;$('#mnote').textContent=on&&!ok?'Arti hanya diisi untuk soal 1 kata.':''}
+const MAX_TRIES=2;
 function wrongAttempt(said,note){
   if(S.answered)return;
   S.tries=(S.tries||0)+1;
   const c=$('.qcard');c.classList.remove('shake');void c.offsetWidth;c.classList.add('shake','wrong');
-  if(S.tries<4){el.micStatus.textContent='Salah'+(note?' ('+note+')':'')+' '+S.tries+'/4. Coba lagi.';(note==='arti'?$('#ans2'):el.ans).select();return}
+  if(S.tries<MAX_TRIES){el.micStatus.textContent='Salah'+(note?' ('+note+')':'')+' '+S.tries+'/'+MAX_TRIES+'. Coba lagi.';(note==='arti'?$('#ans2'):el.ans).select();return}
   S.answered=true;S.counted=true;S.prevStreak=S.sess.streak;S.said=said;S.resultOk=false;
   S.sess.t++;store.t++;S.sess.streak=0;recMiss(false);save();updateScore();
   FX.lose();
@@ -2327,6 +2335,8 @@ el.ans.addEventListener('input',()=>$('.qcard').classList.remove('wrong'));
 $('#ans2').addEventListener('input',()=>$('.qcard').classList.remove('wrong'));
 $('#ans2').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doCheck(e)}});
 $('#mchk').checked=!!store.mchk;
+$('#beepChk').checked=store.beep!==false;
+$('#beepChk').addEventListener('change',()=>{store.beep=$('#beepChk').checked;save()});
 $('#mchk').addEventListener('change',()=>{store.mchk=$('#mchk').checked;save();updMean()});
 el.form.addEventListener('submit',doCheck);
 $('#checkBtn').addEventListener('click',doCheck);   // cadangan bila submit form dicegat oleh skrip/gaya lain di halaman
@@ -2344,6 +2354,30 @@ document.addEventListener('keydown',e=>{
 });
 
 setLen('word');renderStat();
+let tapCtx=null;
+function tapSound(){
+  try{
+    tapCtx=tapCtx||new (window.AudioContext||window.webkitAudioContext)();
+    if(tapCtx.state==='suspended')tapCtx.resume();
+    const t=tapCtx.currentTime,out=tapCtx.createGain(),lp=tapCtx.createBiquadFilter();
+    lp.type='lowpass';lp.frequency.value=4200;out.gain.value=.5;out.connect(lp);lp.connect(tapCtx.destination);
+    const bub=(f0,f1,dur,vol)=>{
+      const o=tapCtx.createOscillator(),g=tapCtx.createGain();
+      o.type='sine';o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur*.45);
+      g.gain.setValueAtTime(0.0001,t);g.gain.exponentialRampToValueAtTime(vol,t+.006);g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+      o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.02);
+    };
+    bub(430,980,.17,.5);bub(860,1900,.1,.14);
+    const nb=tapCtx.createBuffer(1,Math.floor(tapCtx.sampleRate*.03),tapCtx.sampleRate),d=nb.getChannelData(0);
+    for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length);
+    const ns=tapCtx.createBufferSource(),bp=tapCtx.createBiquadFilter(),ng=tapCtx.createGain();
+    ns.buffer=nb;bp.type='bandpass';bp.frequency.value=2600;bp.Q.value=1.1;ng.gain.value=.12;
+    ns.connect(bp);bp.connect(ng);ng.connect(out);ns.start(t);
+  }catch(e){}
+}
+const BTN='button,[role="button"],[data-mode],input[type="checkbox"],summary';
+document.addEventListener('pointerdown',e=>{const b=e.target.closest&&e.target.closest(BTN);if(b&&!b.disabled)beep()},true);
+document.addEventListener('click',e=>{if(e.detail===0){const b=e.target.closest&&e.target.closest(BTN);if(b&&!b.disabled)beep()}},true);
 window.__yomu={makeQ,typedMatches,speechMatches,canon,kanaToRomaji,N,V,A,NA};
 })();
 </script>
