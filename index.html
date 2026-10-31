@@ -1,274 +1,35 @@
-<!doctype html>
-<html lang="id"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Doodle VTuber Tracker</title>
-<style>
-*{box-sizing:border-box;margin:0}
-html,body{height:100%;background:#14121c;color:#f1ecf7;font:14px system-ui,sans-serif}
-main{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:minmax(0,1fr) 210px;height:100%;gap:2px}
-#gr{grid-column:1/-1;background:#0b0912}#g{width:100%;height:100%;display:block}
-#hud{position:absolute;left:8px;bottom:8px;display:flex;gap:4px;flex-wrap:wrap;z-index:2;font:600 11px ui-monospace,monospace}
-#hud span{background:#000b;padding:3px 6px;border-radius:4px}#hud .ok{background:#37d67a;color:#04210f}#hud .no{background:#ff4d6d;color:#fff}
-.pane{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#0e0c14}
-#cam{position:relative;transform:scaleX(-1);width:320px;height:240px;background:#000}
-#cam video,#cam canvas{position:absolute;inset:0;width:100%;height:100%}
-#stage{width:100%;height:100%;object-fit:contain}
-#bar{position:fixed;left:50%;top:10px;transform:translateX(-50%);display:flex;gap:6px;align-items:center;z-index:3;background:#241f33e6;padding:6px;border-radius:12px}
-button{font:inherit;color:inherit;background:#3a3150;border:0;border-radius:8px;padding:8px 12px;cursor:pointer}
-button:hover{background:#4b4067}
-button:focus-visible{outline:2px solid #ff8fb8}
-#go{background:#ff8fb8;color:#2a1030;font-weight:600}
-#msg{padding:0 6px;color:#c9bfe0;max-width:46vw}
-@media(max-width:700px){main{grid-template-columns:1fr;grid-template-rows:1fr 1fr 210px}}
-</style></head><body>
-<main>
- <section class="pane"><div id="hud"></div><div id="cam"><video id="v" playsinline muted></video><canvas id="ov"></canvas></div></section>
- <section class="pane" id="sp"><canvas id="stage" width="1200" height="1800"></canvas></section>
- <section class="pane" id="gr"><canvas id="g"></canvas></section>
-</main>
-<div id="bar"><button id="go">Mulai kamera</button><button id="sk">Rangka</button><button id="bg">Latar</button><span id="msg">Berdiri agar badan terlihat penuh.</span></div>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Prasetijo Andi Blog #3</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+<div id="nav"><a href="index.html">Prasetijo Andi Blog #3</a></div>
+<div id="main">
 
-<script type="module">
-import {PoseLandmarker,HandLandmarker,FaceLandmarker,FilesetResolver} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14";
-const $=id=>document.getElementById(id),video=$('v'),ov=$('ov'),octx=ov.getContext('2d'),cam=$('cam'),c=$('stage').getContext('2d');
-const INK='#3b2a4a',SKIN='#ffe4d6',HAIR='#8db4ff',HAIR2='#b9d3ff',EYE='#4f7cff',NAVY='#2d3a7a',PINK='#ff6b9c';
-let PL,HL,FL,started=false,tracked=false,showSk=true,bgMode=0,f=0,LP=null,LH=[],LF=null;
-const M=[],H=[null,null],BS={};
-const ST={pose:0,hand:0,face:0,pc:null,vis:null,hc:null,fps:0,rfps:0,lt:performance.now()},G=[];let lg=0,lr=performance.now();
-const dv=(a,b)=>{const x=b.x-a.x,y=b.y-a.y,l=Math.hypot(x,y)||1;return{x:x/l,y:y/l}};
-const mixv=(a,b,t)=>{const x=a.x+(b.x-a.x)*t,y=a.y+(b.y-a.y)*t,l=Math.hypot(x,y)||1;return{x:x/l,y:y/l}};
-const add=(p,d,l)=>({x:p.x+d.x*l,y:p.y+d.y*l}),clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
-const rt=(x,y,a)=>({x:x*Math.cos(a)-y*Math.sin(a),y:x*Math.sin(a)+y*Math.cos(a)});
-const DEF={ua:[{x:-.3,y:1},{x:.3,y:1}],fa:[{x:-.2,y:1},{x:.2,y:1}],th:[{x:-.08,y:1},{x:.08,y:1}],sn:[{x:0,y:1},{x:0,y:1}],ft:[{x:-1,y:.25},{x:1,y:.25}]};
-const D={spine:{x:0,y:-1},sh:{x:1,y:0},hd:{x:0,y:-1},...JSON.parse(JSON.stringify(DEF))};
-const P0={x:300,y:520},HP={roll:0,yaw:0,pitch:0};let K=.6;
-const L={T:150,SW:56,HW:34,N:20,HR:64,UA:95,FA:88,TH:135,SN:138,FT:42};
-const S=[[12,14,16,24,26,28,32],[11,13,15,23,25,27,31]]; // 0 = kiri layar, 1 = kanan layar
-const CON=[[11,12],[11,13],[13,15],[12,14],[14,16],[11,23],[12,24],[23,24],[23,25],[25,27],[24,26],[26,28],[27,31],[28,32]];
+<p>Hi! This is my blog #3, for random thoughts/notes. I write it directly and from scratch in simple, readable HTML/CSS. There are no frameworks, static site builders, analytics or RSS feeds, it's just a few .html and .css files that I text edit directly and it works great.</p>
 
-/* ---------- Model ---------- */
-async function init(){
- $('msg').textContent='Memuat model AI…';
- const fs=await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.14/wasm");
- const base="https://storage.googleapis.com/mediapipe-models/";
- const mk=async(C,p,o={})=>{for(const d of['GPU','CPU']){try{return await C.createFromOptions(fs,{baseOptions:{modelAssetPath:base+p,delegate:d},runningMode:'VIDEO',...o})}catch(e){}}throw new Error('Model gagal dimuat')};
- [PL,HL,FL]=await Promise.all([
-  mk(PoseLandmarker,'pose_landmarker/pose_landmarker_full/float16/1/pose_landmarker_full.task'),
-  mk(HandLandmarker,'hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task',{numHands:2}),
-  mk(FaceLandmarker,'face_landmarker/face_landmarker/float16/1/face_landmarker.task',{outputFaceBlendshapes:true})]);
-}
-$('go').onclick=async()=>{
- try{
-  $('go').disabled=true;await init();
-  video.srcObject=await navigator.mediaDevices.getUserMedia({video:{width:1280,height:720,facingMode:'user'}});
-  await video.play();ov.width=video.videoWidth;ov.height=video.videoHeight;fit();
-  started=true;$('go').hidden=true;$('msg').textContent='Aktif. Gerakkan badan, tangan, dan wajahmu.';
- }catch(e){$('go').disabled=false;$('msg').textContent='Gagal: '+(e.message||'izin kamera ditolak')}
-};
-$('sk').onclick=()=>showSk=!showSk;
-$('bg').onclick=()=>{bgMode=(bgMode+1)%2;$('sp').style.background=bgMode?'#00ff00':'#0e0c14'};
-function fit(){const r=video.videoWidth/video.videoHeight||16/9,p=cam.parentElement,w=Math.min(p.clientWidth,p.clientHeight*r);cam.style.width=w+'px';cam.style.height=w/r+'px'}
-addEventListener('resize',fit);
 
-/* ---------- Tracking ---------- */
-function track(){
- const t=performance.now(),vw=video.videoWidth,vh=video.videoHeight;
- const t0=performance.now(),p=PL.detectForVideo(video,t);ST.pose=performance.now()-t0;LP=p.landmarks[0]||null;
- if(LP){ST.pc=LP.reduce((a,q)=>a+(q.visibility??1),0)/LP.length*100;ST.vis=LP.filter(q=>q.visibility>.5).length/LP.length*100}else ST.pc=ST.vis=null;
- ST.fps+=(1000/Math.max(1,t-ST.lt)-ST.fps)*.1;ST.lt=t;
- if(LP){LP.forEach((q,i)=>{const n={x:(1-q.x)*vw,y:q.y*vh,v:q.visibility??1},o=M[i];M[i]=o?{x:o.x+(n.x-o.x)*.6,y:o.y+(n.y-o.y)*.6,v:n.v}:n});solve(vw,vh);tracked=true}
- if(f++%2){
-  const t1=performance.now(),h=HL.detectForVideo(video,t);ST.hand=performance.now()-t1;LH=h.landmarks;
-  ST.hc=h.handedness.length?h.handedness.reduce((a,x)=>a+x[0].score,0)/h.handedness.length*100:null;
-  h.landmarks.forEach(l=>{
-   const pts=l.map(q=>({x:(1-q.x)*vw,y:q.y*vh}));let side=-1,best=1e9;
-   [[16,0],[15,1]].forEach(([id,i])=>{if(M[id]){const d=Math.hypot(M[id].x-pts[0].x,M[id].y-pts[0].y);if(d<best){best=d;side=i}}});
-   if(side<0)return;const o=H[side];
-   H[side]={t,pts:o?pts.map((q,i)=>({x:o.pts[i].x+(q.x-o.pts[i].x)*.55,y:o.pts[i].y+(q.y-o.pts[i].y)*.55})):pts};
-  });
- }else{
-  const t1=performance.now(),r=FL.detectForVideo(video,t);ST.face=performance.now()-t1;LF=r.faceLandmarks[0]||null;
-  const b=r.faceBlendshapes[0];
-  if(b)b.categories.forEach(k=>{const a=/Blink/.test(k.categoryName)?.85:.55;BS[k.categoryName]=(BS[k.categoryName]||0)*(1-a)+k.score*a});
- }
-}
-function solve(vw,vh){
- const ok=i=>M[i]&&M[i].v>.5,mid=(a,b)=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2});
- const up=(cur,a,b,def)=>ok(a)&&ok(b)?mixv(cur,dv(M[a],M[b]),.7):mixv(cur,def,.04);
- let sc=null;
- if(ok(11)&&ok(12)&&ok(23)&&ok(24)){
-  const hc=mid(M[23],M[24]);sc=mid(M[11],M[12]);
-  D.spine=mixv(D.spine,dv(hc,sc),.7);D.sh=mixv(D.sh,dv(M[12],M[11]),.7);
-  K+=(L.T/(Math.hypot(sc.x-hc.x,sc.y-hc.y)||1)-K)*.1;
-  const tx=clamp(300+(hc.x-vw/2)*K,170,430),ty=clamp(520+(hc.y-vh*.62)*K,440,540);
-  P0.x+=(tx-P0.x)*.3;P0.y+=(ty-P0.y)*.3;
- }
- if(sc&&ok(7)&&ok(8)&&ok(0)){
-  const em=mid(M[7],M[8]),ed=Math.hypot(M[7].x-M[8].x,M[7].y-M[8].y)||1;
-  D.hd=mixv(D.hd,dv(sc,em),.6);
-  HP.roll+=(Math.atan2(M[7].y-M[8].y,M[7].x-M[8].x)-HP.roll)*.5;
-  HP.yaw+=(clamp((M[0].x-em.x)/ed,-.7,.7)-HP.yaw)*.5;
-  HP.pitch+=(clamp((M[0].y-em.y)/ed-.3,-.5,.5)-HP.pitch)*.5;
- }
- S.forEach(([sh,el,wr,hp,kn,an,ft],i)=>{
-  D.ua[i]=up(D.ua[i],sh,el,DEF.ua[i]);D.fa[i]=up(D.fa[i],el,wr,DEF.fa[i]);
-  D.th[i]=up(D.th[i],hp,kn,DEF.th[i]);D.sn[i]=up(D.sn[i],kn,an,DEF.sn[i]);D.ft[i]=up(D.ft[i],an,ft,DEF.ft[i]);
- });
-}
+<div class="post">
+    <div class="post-date">Feb 3 2026</div>
+    <div class="post-title"><a href="mathrock.html">Apakah <i>Mathrock</i> Itu Benar-Benar Matematika?</a></div>
+    <div class="post-preview">Apakah <i>Mathrock</i> Itu Benar-Benar Matematika? atau Sekadar Cara Elegan Mengatakan <i>“Kami Anti Lagu Pop”</i></div>
+</div>
 
-/* ---------- Rig ---------- */
-function rig(){
- const hip={x:P0.x,y:P0.y+(tracked?0:Math.sin(performance.now()/700)*3)},ch=add(hip,D.spine,L.T),J={hip,ch};
- J.s=[-1,1].map(s=>add(ch,D.sh,s*L.SW));J.h=[-1,1].map(s=>add(hip,D.sh,s*L.HW));
- J.neck=add(ch,D.hd,L.N);J.head=add(J.neck,D.hd,L.HR*.85);
- J.e=[0,1].map(i=>add(J.s[i],D.ua[i],L.UA));J.w=[0,1].map(i=>add(J.e[i],D.fa[i],L.FA));
- J.k=[0,1].map(i=>add(J.h[i],D.th[i],L.TH));J.a=[0,1].map(i=>add(J.k[i],D.sn[i],L.SN));J.t=[0,1].map(i=>add(J.a[i],D.ft[i],L.FT));
- return J;
-}
+<div class="post">
+    <div class="post-date">Nov 2 2026</div>
+    <div class="post-title"><a href="latihanmembacajepang.html">Akhir dari Software</a></div>
+    <div class="post-preview">Japan #1</div>
+</div>
 
-/* ---------- Gambar ---------- */
-function circ(p,r,fill,ink=2.5){c.beginPath();c.arc(p.x,p.y,r,0,7);c.fillStyle=fill;c.strokeStyle=INK;c.lineWidth=ink;if(ink)c.stroke();c.fill()}
-function cap(a,b,r1,r2,fill){
- const dx=b.x-a.x,dy=b.y-a.y,l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;
- for(const [o,col] of [[2.5,INK],[0,fill]]){
-  c.fillStyle=col;c.beginPath();
-  c.moveTo(a.x+nx*(r1+o),a.y+ny*(r1+o));c.lineTo(b.x+nx*(r2+o),b.y+ny*(r2+o));
-  c.lineTo(b.x-nx*(r2+o),b.y-ny*(r2+o));c.lineTo(a.x-nx*(r1+o),a.y-ny*(r1+o));c.fill();
-  c.beginPath();c.arc(a.x,a.y,r1+o,0,7);c.arc(b.x,b.y,r2+o,0,7);c.fill();
- }
-}
-function poly(pts,fill,stroke=INK,lw=2.5){c.beginPath();pts.forEach((p,i)=>i?c.lineTo(p.x,p.y):c.moveTo(p.x,p.y));c.closePath();c.fillStyle=fill;c.strokeStyle=stroke;c.lineWidth=lw;c.fill();if(lw)c.stroke()}
-const TL=[null,null];
-function tails(J){
- [-1,1].forEach((s,i)=>{
-  const a=add(J.head,rt(s*L.HR*.85,-L.HR*.45,HP.roll),1),tg={x:a.x+s*22,y:a.y+150};
-  const T=TL[i]||(TL[i]={x:tg.x,y:tg.y,vx:0,vy:0});
-  T.vx=(T.vx+(tg.x-T.x)*.1)*.82;T.vy=(T.vy+(tg.y-T.y)*.1)*.82;T.x+=T.vx;T.y+=T.vy;
-  const m={x:(a.x+T.x)/2+s*26,y:(a.y+T.y)/2};
-  c.beginPath();c.moveTo(a.x-9,a.y);c.quadraticCurveTo(m.x-s*12,m.y,T.x,T.y+14);c.quadraticCurveTo(m.x+s*14,m.y,a.x+9,a.y);
-  c.fillStyle=HAIR;c.strokeStyle=INK;c.lineWidth=2.5;c.fill();c.stroke();
-  circ(a,8,PINK);
- });
-}
-const FING=[[1,2,3,4],[5,6,7,8],[9,10,11,12],[13,14,15,16],[17,18,19,20]];
-function hand(i,w,fa){
- const h=H[i];
- if(!h||performance.now()-h.t>350){circ(add(w,fa,14),13,SKIN);return}
- const p=h.pts,sc=clamp(40/(Math.hypot(p[9].x-p[0].x,p[9].y-p[0].y)||1),.3,2);
- const q=p.map(a=>({x:w.x+(a.x-p[0].x)*sc,y:w.y+(a.y-p[0].y)*sc}));
- const palm=[0,1,5,9,13,17].map(k=>q[k]);poly(palm,SKIN);
- c.lineCap=c.lineJoin='round';
- for(const [lw,col] of [[11,INK],[6.5,SKIN]]){
-  c.strokeStyle=col;c.lineWidth=lw;
-  FING.forEach(fg=>{c.beginPath();fg.forEach((k,n)=>n?c.lineTo(q[k].x,q[k].y):c.moveTo(q[k].x,q[k].y));c.stroke()});
- }
- poly(palm,SKIN,SKIN,0);
-}
-const b=n=>BS[n]||0;
-function head(J){
- const R=L.HR;c.save();c.translate(J.head.x,J.head.y);c.rotate(HP.roll);
- circ({x:0,y:-R*.1},R*1.1,HAIR); // rambut belakang
- c.beginPath();c.moveTo(-R*.9,-R*.1);c.bezierCurveTo(-R*.9,-R*.95,R*.9,-R*.95,R*.9,-R*.1);
- c.bezierCurveTo(R*.85,R*.6,R*.3,R,0,R*1.02);c.bezierCurveTo(-R*.3,R,-R*.85,R*.6,-R*.9,-R*.1);
- c.fillStyle=SKIN;c.strokeStyle=INK;c.lineWidth=2.5;c.fill();c.stroke();
- const fx=HP.yaw*R*.55,fy=HP.pitch*R*.5;
- const gx=((b('eyeLookOutLeft')-b('eyeLookInLeft'))+(b('eyeLookInRight')-b('eyeLookOutRight')))/2;
- const gy=(b('eyeLookDownLeft')+b('eyeLookDownRight')-b('eyeLookUpLeft')-b('eyeLookUpRight'))/2;
- [-1,1].forEach(s=>{
-  const sd=s<0?'Right':'Left',bl=b('eyeBlink'+sd),ex=s*R*.42+fx,ey=R*.12+fy,rx=R*.25,ry=Math.max(1.5,R*.34*(1-.92*bl));
-  c.beginPath();c.ellipse(ex,ey,rx,ry,0,0,7);c.fillStyle='#fff';c.fill();
-  c.save();c.clip();
-  c.fillStyle=EYE;c.beginPath();c.ellipse(ex+gx*rx*.5,ey+gy*ry*.4,rx*.75,ry*1.05,0,0,7);c.fill();
-  c.fillStyle='#1d2350';c.beginPath();c.ellipse(ex+gx*rx*.5,ey+gy*ry*.4,rx*.38,ry*.6,0,0,7);c.fill();
-  c.fillStyle='#fff';c.beginPath();c.arc(ex+gx*rx*.5-rx*.25,ey-ry*.35,rx*.2,0,7);c.fill();
-  c.restore();
-  c.strokeStyle=INK;c.lineWidth=3.5;c.beginPath();c.ellipse(ex,ey,rx,ry,0,Math.PI*1.02,Math.PI*1.98);c.stroke();
-  c.lineWidth=2.5;c.beginPath();c.moveTo(ex+s*rx,ey-ry*.3);c.lineTo(ex+s*(rx+7),ey-ry*.7);c.stroke();
-  const by=ey-ry-R*.14-b('browInnerUp')*R*.16+b('browDown'+sd)*R*.1;
-  c.lineWidth=3;c.beginPath();c.moveTo(ex-rx,by+s*2);c.lineTo(ex+rx,by-s*2);c.stroke();
-  c.fillStyle='#ff8fa855';c.beginPath();c.ellipse(s*R*.6+fx,R*.45+fy,R*.14,R*.08,0,0,7);c.fill();
- });
- const o=b('jawOpen'),sm=(b('mouthSmileLeft')+b('mouthSmileRight'))/2,pk=b('mouthPucker'),mx=fx*1.1,my=R*.62+fy,mw=R*(.2+.12*sm-.1*pk);
- c.strokeStyle=INK;c.lineWidth=2.5;
- if(o>.06){const mh=o*R*.42;c.beginPath();c.ellipse(mx,my+mh/2,mw,mh/2+1,0,0,7);c.fillStyle='#7a2540';c.fill();c.stroke()}
- else{c.beginPath();c.moveTo(mx-mw,my);c.quadraticCurveTo(mx,my+R*(.04+.12*sm),mx+mw,my);c.stroke()}
- c.beginPath();c.moveTo(fx*1.1-3,R*.4+fy);c.lineTo(fx*1.1+3,R*.4+fy);c.stroke();
- [-1,1].forEach(s=>{c.beginPath();c.moveTo(s*R*.98,-R*.1);c.quadraticCurveTo(s*R*1.15,R*.55,s*R*.82,R*1.05);c.quadraticCurveTo(s*R*.78,R*.5,s*R*.72,R*.1);c.closePath();c.fillStyle=HAIR;c.fill();c.stroke()});
- c.beginPath();c.moveTo(-R,R*.05);c.bezierCurveTo(-R,-R*1.15,R,-R*1.15,R,R*.05);
- [[.8,.12],[.55,-.35],[.3,0],[.05,-.4],[-.2,.02],[-.5,-.38],[-.75,.1]].forEach(([x,y])=>c.lineTo(x*R,y*R));
- c.closePath();c.fillStyle=HAIR;c.fill();c.stroke();
- c.beginPath();c.moveTo(-R*.2,-R*.8);c.quadraticCurveTo(0,-R*.95,R*.25,-R*.75);c.strokeStyle=HAIR2;c.lineWidth=5;c.stroke();
- c.beginPath();c.moveTo(0,-R*1.08);c.quadraticCurveTo(-R*.25,-R*1.5,R*.1,-R*1.55);c.strokeStyle=INK;c.lineWidth=3;c.stroke();
- c.restore();
-}
-function bgFill(){
- if(bgMode){c.fillStyle='#00ff00';c.fillRect(0,0,600,900);return}
- const g=c.createLinearGradient(0,0,0,900);g.addColorStop(0,'#2a2150');g.addColorStop(1,'#4b2f63');c.fillStyle=g;c.fillRect(0,0,600,900);
-}
-function draw(){
- c.setTransform(2,0,0,2,0,0);c.lineCap=c.lineJoin='round';bgFill();
- const J=rig(),fy=Math.max(J.a[0].y,J.a[1].y)+18;
- c.fillStyle='#0003';c.beginPath();c.ellipse(P0.x,fy,110,16,0,0,7);c.fill();
- tails(J);
- [0,1].forEach(i=>{cap(J.h[i],J.k[i],15,11,SKIN);cap(J.k[i],J.a[i],11,8,SKIN);cap(J.a[i],J.t[i],8,7,PINK)});
- poly([J.s[0],J.s[1],J.h[1],J.h[0]],'#fff');
- poly([add(J.ch,D.sh,-14),add(J.ch,D.sh,14),add(J.ch,D.spine,-34)],NAVY);circ(add(J.ch,D.spine,-24),7,PINK,2);
- const bt=add(J.hip,D.spine,-62);poly([add(J.hip,D.sh,-L.HW-4),add(J.hip,D.sh,L.HW+4),add(bt,D.sh,L.HW+34),add(bt,D.sh,-L.HW-34)],NAVY);
- cap(J.ch,J.neck,9,8,SKIN);
- [0,1].forEach(i=>{cap(J.s[i],J.e[i],12,10,'#fff');cap(J.e[i],J.w[i],8,6.5,SKIN)});
- head(J);
- [0,1].forEach(i=>hand(i,J.w[i],D.fa[i]));
-}
-function drawOv(){
- const W=ov.width,Hh=ov.height;octx.clearRect(0,0,W,Hh);if(!started)return;box(W,Hh);if(!showSk)return;
- const dot=(q,r)=>{octx.beginPath();octx.arc(q.x*W,q.y*Hh,r,0,7);octx.fill()};
- octx.fillStyle='#ff8fb8';octx.strokeStyle='#7ee8ff';octx.lineWidth=3;
- if(LP){CON.forEach(([a,z])=>{if(LP[a].visibility>.5&&LP[z].visibility>.5){octx.beginPath();octx.moveTo(LP[a].x*W,LP[a].y*Hh);octx.lineTo(LP[z].x*W,LP[z].y*Hh);octx.stroke()}});LP.forEach(q=>dot(q,4))}
- octx.fillStyle='#ffe66b';LH.forEach(l=>l.forEach(q=>dot(q,3)));
- octx.fillStyle='#9dffb0';if(LF)LF.forEach(q=>dot(q,1.2));
-}
-function box(W,Hh){
- if(!LP)return;const v=LP.filter(q=>q.visibility>.5);if(v.length<4)return;
- const xs=v.map(q=>q.x*W),ys=v.map(q=>q.y*Hh),pd=24,x0=Math.min(...xs)-pd,x1=Math.max(...xs)+pd,y0=Math.min(...ys)-pd,y1=Math.max(...ys)+pd;
- octx.strokeStyle='#37d67a';octx.lineWidth=3;octx.strokeRect(x0,y0,x1-x0,y1-y0);
- const lb='LOCKED #1  '+ST.pc.toFixed(0)+'%';octx.save();octx.translate(x1,Math.max(20,y0-4));octx.scale(-1,1);
- octx.font='600 15px ui-monospace,monospace';const tw=octx.measureText(lb).width+12;
- octx.fillStyle='#37d67a';octx.fillRect(0,-18,tw,22);octx.fillStyle='#04210f';octx.fillText(lb,6,-2);octx.restore();
-}
-function hud(){
- $('hud').innerHTML=!started?'':`<span class="${LP?'ok':'no'}">${LP?'TRACKING':'LOST'}</span><span>POSE ${ST.pose.toFixed(0)}ms</span><span>HAND ${LH.length}</span><span>FACE ${LF?'ON':'OFF'}</span><span>${ST.fps.toFixed(0)} FPS</span>`;
-}
-const gc=$('g'),gx=gc.getContext('2d');
-const STR=[
- {n:'Kecepatan (FPS)',max:()=>60,s:[['fps','#7ee8ff','deteksi'],['rfps','#ffe66b','render']]},
- {n:'Latensi model (ms)',u:1,max:()=>Math.max(40,...G.map(g=>Math.max(g.pose,g.hand,g.face))),s:[['pose','#ff8fb8','pose'],['hand','#ffe66b','tangan'],['face','#9dffb0','wajah']]},
- {n:'Keyakinan model (%)',max:()=>100,s:[['pc','#ff8fb8','pose'],['vis','#7ee8ff','titik terlihat'],['hc','#ffe66b','tangan']]}];
-function drawG(){
- const d=devicePixelRatio||1,W=gc.clientWidth,Hh=gc.clientHeight;
- if(gc.width!==Math.round(W*d)||gc.height!==Math.round(Hh*d)){gc.width=Math.round(W*d);gc.height=Math.round(Hh*d)}
- gx.setTransform(d,0,0,d,0,0);gx.clearRect(0,0,W,Hh);gx.font='11px ui-monospace,monospace';
- if(!G.length){gx.fillStyle='#8b82a6';gx.textAlign='center';gx.fillText('Grafik muncul setelah kamera aktif',W/2,Hh/2);return}
- const sh=(Hh-6)/3,x0=40,x1=W-8,now=G[G.length-1].t,span=30000;
- STR.forEach((s,i)=>{
-  const y=4+i*sh,h=sh-5,mx=s.max();
-  gx.fillStyle='#161326';gx.fillRect(x0,y,x1-x0,h);
-  gx.fillStyle='#8b82a6';gx.textAlign='right';gx.fillText(Math.round(mx),x0-5,y+10);gx.fillText('0',x0-5,y+h);
-  s.s.forEach(([k,col])=>{
-   gx.strokeStyle=col;gx.lineWidth=1.6;gx.beginPath();let pen=false;
-   G.forEach(g=>{const v=g[k];if(v==null){pen=false;return}const px=x1-(now-g.t)/span*(x1-x0),py=y+h-clamp(v/mx,0,1)*h;pen?gx.lineTo(px,py):gx.moveTo(px,py);pen=true});
-   gx.stroke();
-  });
-  let lx=x0+8;gx.textAlign='left';gx.fillStyle='#8b82a6';gx.fillText(s.n,lx,y+12);lx+=gx.measureText(s.n).width+14;
-  s.s.forEach(([k,col,nm])=>{const c0=G[G.length-1][k],t=nm+' '+(c0==null?'-':c0.toFixed(s.u?1:0));gx.fillStyle=col;gx.fillText(t,lx,y+12);lx+=gx.measureText(t).width+14});
- });
-}
-let last=-1;
-function loop(){
- if(started&&video.readyState>=2&&video.currentTime!==last){last=video.currentTime;try{track()}catch(e){}}
- const n=performance.now();ST.rfps+=(1000/Math.max(1,n-lr)-ST.rfps)*.05;lr=n;
- if(started&&n-lg>100){lg=n;G.push({t:n,fps:ST.fps,rfps:ST.rfps,pose:ST.pose,hand:ST.hand,face:ST.face,pc:ST.pc,vis:ST.vis,hc:ST.hc});if(G.length>300)G.shift();hud()}
- drawOv();draw();drawG();requestAnimationFrame(loop);
-}
-loop();
-</script>
-</body></html>
+ <div class="post">
+    <div class="post-date">Oct 31 2026</div>
+    <div class="post-title"><a href="genki1.html">Akhir dari Software</a></div>
+    <div class="post-preview">Japan #2</div>
+ </div>
+
+</body>
+</html>
